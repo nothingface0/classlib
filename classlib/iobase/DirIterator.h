@@ -49,7 +49,7 @@ class Filename;
 
     The end indicator for the iteration range is the default
     constructed iterator.  */
-class DirIterator : public std::iterator<std::input_iterator_tag, std::string, ptrdiff_t>
+class DirIterator : public std::iterator<std::input_iterator_tag, std::string, std::ptrdiff_t>
 {
 public:
     typedef std::input_iterator_tag	iterator_category;
