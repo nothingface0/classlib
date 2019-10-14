@@ -1,0 +1,385 @@
+2011-03-17  Lassi Tuura  <lat@iki.fi>
+
+	* src/iobase/InetServerSocket.cpp: Initialise base class
+	InetSocket with address family of the bind address.
+
+2011-03-15  Lassi Tuura  <lat@iki.fi>
+
+	* classlib/iotools/ReadWriteBuffer.h: Need <cstddef> for
+	ptrdiff_t, found by builds using GCC 4.6.x.
+
+2011-02-02  Lassi Tuura  <lat@iki.fi>
+
+	* src/iobase/InetSocket.cpp (InetAddress): Always initialise
+	m_addrlen so that default-constructed InetAddress reports a
+	reasonable size when used in getpeername() type calls.
+
+2010-11-02  Lassi Tuura  <lat@iki.fi>
+
+	* src/zip/TarOutputStream.cpp (<cstdio>): Add required header.
+
+	* src/iobase/IOSelectKqueue.cpp (<cstring>): Add required header.
+
+	* classlib/zip/CPIOConstants.h (ODC_LARGE_MAX): Move outside enum
+	and make explicitly long-long type constant (IOOffset). The range
+	exceeds normal types on 32-bit systems, and it's undesirable to
+	make all the enum constants long-long type.
+
+	* Makefile.am (nobase_include_HEADERS): Add Detect.h, inttypes.h.
+
+	* Makefile.am (nobase_include_HEADERS): Add Deprecated.h.
+
+2010-10-25  Lassi Tuura  <lat@iki.fi>
+
+	* src/iobase/UnixSubProcess.cpp (sysrun): Close parent in, out,
+	error file descriptors only after all redirections have been done
+	so they can refer to each other. Correct 'Search' option behaviour
+	to match documentation.
+
+	* src/zip/TarInputStream.cpp: Need <cstdlib>.
+
+	* src/zip/LZOError.cpp, src/zip/LZMAError.cpp: Need <cstring>.
+
+	* CMakeLists.txt, cfg/FindLZMA.cmake, Makefile.am, configure.in,
+	cfg/extlibs.m4: Find LZMA and fix LZO autotools issues.
+
+	* classlib/zip/LZMAConstants.h, classlib/zip/LZMACompressor.h,
+	src/zip/LZMACompressor.cpp, classlib/zip/LZMADecompressor.h,
+	src/zip/LZMADecompressor.cpp, classlib/zip/LZMAError.h,
+	src/zip/LZMAError.cpp, test/zip/LZMACompressor01.cpp:
+	Add LZMA compression interface.
+
+	* classlib/zip/LZOError.h: Fix incorrect parametre name.
+
+	* src/zip/ZCompressor.cpp: Use Z_NO_FLUSH instead of 0 for the
+	default state. Use Z_SYNC_FLUSH not Z_FULL_FLUSH for flush() to
+	avoid resetting compression dictionary.
+	
+	* test/zip/MD5Digest01.cpp, test/zip/SHA1Digest01.cpp: Better test.
+
+	* tests/zip/ZCompressor01.cpp, tests/zip/LZOCompressor01.cpp,
+	tests/zip/test.txt: Rewritten and new test for thorough exercise
+	of compression and decompression engines on a sample public domain
+	text file (http://www.gutenberg.org/cache/epub/8451/pg8451.txt).
+
+	* src/zip/ZCompressor.cpp, src/zip/ZDecompressor.cpp (reset):
+	Reset the stream contents only if the stream already exists.
+
+	* src/zip/MD5Digest.cpp, src/zip/SHA1Digest.cpp: Allow the digest
+	value to be retrieved several times; get the value from OpenSLL
+	only on the first digest request.
+
+	* classlib/zip/LZOConstants.h, classlib/zip/LZOCompressor.h,
+	classlib/zip/LZODecompressor.h, src/zip/LZOCompressor.cpp,
+	src/zip/LZODecompressor.cpp: Rewrite, make LZO interface more
+	convenient and useful.
+
+	* classlib/zip/Decompressor.h (checksum): Remove required method.
+
+	* CMakeLists.txt, cfg/FindLZO.cmake: Find OpenSSL and LZO, with a
+	new config fragment for LZO. All external libraries are required.
+
+2010-10-22  Lassi Tuura  <lat@iki.fi>
+
+	* cfg/ltmain.sh: Remove from version control.
+
+	* Makefile.am, configure.in, cfg/extlibs.m4: Update for use with
+	openssl instead of embedded RFC md5/sha1 libraries. Update test
+	makefile fragments to changed locations.
+
+2010-10-15  Lassi A. Tuura  <lat@iki.fi>
+
+	* CMakeLists.txt, Makefile.am, configure.in, cfg/FindPCRE.cmake,
+	cfg/check-syms.h, cfg/config.guess, cfg/config.sub, cfg/ltmain.sh,
+	cfg/cpp.m4, cfg/extlibs.m4, cfg/files.m4, cfg/io.m4, cfg/misc.m4,
+	cfg/network.m4, cfg/resource.m4, cfg/signal.m4, cfg/system.m4,
+	cfg/time.m4, classlib/sysapi/Detect.h, classlib/sysapi/config.h.in,
+	classlib/sysapi/config.h.cmake, classlib/sysapi/system.h,
+	ext/aix-dlfcn, ext/bz2lib, ext/pcre, ext/rfc1321, ext/rfc3174,
+	ext/rx, ext/uuid, ext/zlib, cfg/build-windows.sh: Provide
+	cmake-based build, preferred over still supported but secondary
+	autotools build. Remove obsolete C++ and system checks, including
+	removing support for old iostreams and other standard library
+	quirks no longer relevant. Remove autotools feature checks when
+	check can be reasonably done at compile time or using POSIX or
+	platform feature macros. Prefix feature macros with "CLASSLIB" to
+	avoid collisions. Remove embedded externals, require them to be
+	provided separately. Provide utility to build the required
+	externals from original source on windows.
+
+	* (numerous files): Remove support for obsolete pre-standard C++
+	features. Prefer compile time checks and POSIX or platform feature
+	macros. Prefix feature macros with "CLASSLIB" to avoid collisions.
+	Limit checks to portability required for actually supported
+	platforms. Select low-level implementation based on compile time
+	existence check of required functions and structure members.
+	Comment out uses of 'restrict'. Improve wide integer type support.
+	Update and improve Windows, BSD and OS X support. Return IOOffset
+	from input streams' available() method. Avoid dependencies on
+	linux dynamic linker symbols by hooking into .init_array. Remove
+	code structure comments.
+
+	* classlib/utils/Deprecated.h: New, for marking deprecated APIs.
+
+	* src/utils/IntTraits.cpp, src/utils/StringHack.h: Removed.
+
+	* classlib/sysapi/IOTypes.h: Add systemoffconv<T>() for safe file
+	offset type conversions. Remove code structure comments.
+
+	* classlib/sysapi/WindowsIO.h, classlib/sysapi/nonstdint.h,
+	classlib/sysapi/inttypes.h: Update Windows support, add fallback
+	stdint.h and inttypes.h for MSVC++. Use proper non-standard
+	functions (_access vs. access).  Remove code structure comments.
+
+	* classlib/utils/TimeConst.h: Add TIME_MAX for maximum
+	representable time. Remove code structure comments.
+
+	* src/iobase/Filename.cpp: Remove support for obsolete
+	pre-standard C++ features. Fix glob() implementation. Prefer
+	compile time checks and POSIX or platform feature macros. Remove
+	code structure comments.
+
+	* classlib/iobase/IOError.h, src/iobase/IOError.cpp,
+	classlib/iobase/NetworkError.h, src/iobase/NetworkError.cpp:
+	Permit construction with textual message instead of error code,
+	needed for IPv6 support. Remove code structure comments.
+
+	* classlib/iobase/IOSelectCB.h, classlib/iobase/IOSelectEvent.h,
+	classlib/iobase/IOSelector.h, src/iobase/IOSelectDevPoll.h,
+	src/iobase/IOSelectDevPoll.cpp, src/iobase/IOSelectFdMap.h,
+	src/iobase/IOSelectFdMap.cpp, src/iobase/IOSelectKqueue.h,
+	src/iobase/IOSelectKqueue.cpp, src/iobase/IOSelectMethod.h,
+	src/iobase/IOSelectMethod.cpp, src/iobase/IOSelectPoll.h,
+	src/iobase/IOSelectPoll.cpp, src/iobase/IOSelectRequest.h,
+	src/iobase/IOSelectSelect.h, src/iobase/IOSelectSelect.cpp,
+	src/iobase/IOSelectSig.h, src/iobase/IOSelectSig.cpp,
+	src/iobase/IOSelectSigFd.h, src/iobase/IOSelectSigFd.cpp,
+	src/iobase/IOSelectWindows.h, src/iobase/IOSelectWindows.cpp,
+	src/iobase/IOSelector.cpp: Fix bugs in file descriptor map to
+	request management, especially when the map changes size or a
+	descriptor is detached while still pumping events for it; rename
+	fd2index to fd2req. Fix kqueues to separately track read and write
+	events. Handle internal vectors better. Prefer compile time checks
+	and POSIX or platform feature macros. Prefix own feature macros
+	with "CLASSLIB" to avoid collisions. Remove excess portability
+	checks not needed on any real supported platform. Remove code
+	structure comments.
+
+	* classlib/utils/UUID.h, src/utils/UUID.cpp, src/utils/UUIDError.h,
+	src/utils/UUIDError.cpp: Drop use of external library, implement
+	the functionality directly here. Remove code structure comments.
+	* test/utils/UUID01.cpp, test/utils/UUID02.cpp,
+	test/utils/UUID03.cpp, test/utils/UUID04.cpp: Assert valid test
+	result instead of printing out the results.
+	* test/utils/UUID05.cpp: Improve test accuracy.
+	* test/utils/UUID06.cpp: New. Check for correct UUID parsing.
+
+	* classlib/iobase/InetServerSocket.h,
+	src/iobase/InetServerSocket.cpp, classlib/iobase/InetSocket.h,
+	src/iobase/InetSocket.cpp, classlib/iobase/LocalServerSocket.h,
+	src/iobase/LocalServerSocket.cpp, classlib/iobase/LocalSocket.h,
+	classlib/sysapi/LocalSocket.h, src/iobase/LocalSocket.cpp,
+	classlib/iobase/Socket.h, src/iobase/Socket.cpp,
+	osrc/iobase/UnixSocket.cpp, src/iobase/WindowsSocket.cpp,
+	classlib/iobase/SocketConst.h, src/iobase/SocketConst.cpp,
+	classlib/sysapi/InetSocket.h, classlib/sysapi/Socket.h,
+	test/iobase/InetSocket01.cpp: Add full IPv6 support for dual-stack
+	IPv4/IPv6 systems. Restructure socket address objects entirely as
+	a consequence; the size needs to depend on socket type. Expect and
+	use socklen_t with APIs as per modern definitions. Expose and
+	prefer operating system's own socket constants, and deprecate the
+	wrapper constant symbols. Prefer compile time checks and POSIX or
+	platform feature macros. Remove code structure comments. Test more
+	of IPv6 and IPv4.
+
+	* classlib/iobase/TempFile.h, classlib/sysapi/TempFile.h,
+	src/iobase/TempFile.cpp, src/iobase/UnixTempFile.cpp,
+	src/iobase/WindowsTempFile.cpp: Make helper functions private to
+	implementation. Select right function to use at compile time, use
+	system family of secure functions where they exist, otherwise local
+	ones. Remove code structure comments.
+
+	* classlib/zip/Compressor.h, src/zip/Compressor.cpp,
+	classlib/zip/BZCompressor.h, src/zip/BZCompressor.cpp,
+	classlib/zip/ZCompressor.h, src/zip/ZCompressor.cpp: Remove
+	checksum in compression engines. Remove code structure comments.
+
+	* classlib/zip/CompressOutputStream.h,
+	src/zip/CompressOutputStream.cpp: Make checksum calculation
+	optional. Remove code structure comments.
+
+	* classlib/zip/CPIOConstants.h, src/zip/CPIOConstants.cpp,
+	classlib/zip/CPIOError.h, src/zip/CPIOError.cpp,
+	classlib/zip/CPIOInputStream.h, src/zip/CPIOInputStream.cpp,
+	classlib/zip/CPIOMember.h, src/zip/CPIOMember.cpp,
+	classlib/zip/CPIOOutputStream.h, src/zip/CPIOOutputStream.cpp:
+	Implement full POSIX compatibility. Make checksum validation
+	optional in streaming for different archive formats - SVR4 vs.
+	SVR4-with-checksum. Improve internal validation. Add thorough
+	documentation and much better error information. Use IOOffset for
+	available(). Remove support for obsolete pre-standard iostreams.
+	Remove code structure comments. Remove code structure comments.
+
+	* classlib/zip/TarConstants.h, src/zip/TarConstants.cpp,
+	classlib/zip/TarError.h, src/zip/TarError.cpp,
+	classlib/zip/TarInputStream.h, src/zip/TarInputStream.cpp,
+	classlib/zip/TarMember.h, src/zip/TarMember.cpp,
+	classlib/zip/TarOutputStream.h, src/zip/TarOutputStream.cpp:
+	Implement full POSIX compatibility including PAX archive support
+	and several GNU TAR extensions.  Improve internal validation. Add
+	thorough documentation and much better error information. Add info
+	on known extensions, even if not supported. Use IOOffset for
+	available(). Remove code structure comments.
+
+	* classlib/zip/ZConstants.h: Make maximum width constants unsigned.
+	Remove code structure comments.
+
+	* classlib/zip/MD5Digest.h, src/zip/MD5Digest.cpp,
+	classlib/zip/SHA1Digest.h, src/zip/SHA1Digest.cpp,
+	classlib/zip/SHA1Error.h, src/zip/SHA1Error.cpp:
+	Reimplement using OpenSSL.  Remove code structure comments.
+
+	* test/Test.h: Enable test bundling to a single test driver.
+	* test/utils/SearchPath02.cpp, test/utils/exa_Debug.cpp,
+	test/utils/exa_Log.cpp, test/utils/exa_ResourceInfo.cpp,
+	test/utils/exa_Signal.cpp: Make test program driver compliant.
+
+	* test/iobase/Filename02-00.h: Remove unnecessary declarations.
+
+	* test/iotools/BufferOutputStream01.cpp,
+	test/iotools/FilterOutputStream01.cpp,
+	test/iotools/IOChannelOutputStream01.cpp,
+	test/zip/ZipOutputStream00.cpp: Tidy up.
+
+	* test/iotools/CheckedInputStream01.cpp,
+	test/zip/CheckedInputStream01.cpp,
+	test/iotools/CheckedOutputStream01.cpp,
+	test/zip/CheckedOutputStream01.cpp:
+	Move tests to the correct directory.
+
+	* test/utils/BitTraits01.cpp: Handle long long vs. __int64.
+
+	* test/utils/IntBits03.cpp: Remove CLASSLIB prefix from integer
+	limit macros.
+
+	* test/utils/LowMemoryPool01.cpp: Disable on OS X. Touch allocated
+	memory to force operating system to commit the allocation.
+
+	* test/utils/MultiMethod01.cpp, test/utils/MultiMethod02.cpp,
+	test/utils/MultiMethod03.cpp: Hide test types into local anonymous
+	namespace to avoid clashes when all tests are bundled to one test
+	driver program.
+
+	* test/utils/ProcessInfo01.cpp: Fix bug in argv handling.
+
+	* test/utils/SharedLibrary01.cpp: Update test library name.
+
+	* test/utils/Time01.cpp: Fix bugs in daylight handling and in time
+	comparisons. Tidy up formatting.
+
+	* test/utils/TimeInfo01.cpp, test/utils/TimeInfo02.cpp: Print
+	values with maximum precision. No need to call TimeInfo::init().
+
+	* classlib/zip/LZOCompressor.h, src/zip/LZOCompressor.cpp,
+	classlib/zip/LZOConstants.h, classlib/zip/LZODecompressor.h,
+	src/zip/LZODecompressor.cpp, classlib/zip/LZOError.h,
+	src/zip/LZOError.cpp: Add LZO compression engine interface.
+
+2008-12-12  Lassi A. Tuura  <lat@iki.fi>
+
+	* classlib/iobase/SubProcess.h, src/iobase/SubProcess.cpp,
+	src/iobase/UnixSubProcess.cpp, src/iobase/WindowsSubProcess.cpp:
+	Add support for redirecting standard error in child process.
+
+	* test/iobase/SubProcess04.cpp: Generate output on stderr.
+	* test/iobase/SubProcess05.cpp: New test, suppress stderr output.
+	* Makefile.am: Build new SubProcess05 test.
+
+2008-11-17  Lassi A. Tuura  <lat@iki.fi>
+
+	* classlib/utils/Regexp.h, src/utils/Regexp.cc: Avoid excess
+	strlen() calls for std::string method variants.
+
+2008-11-11  Lassi A. Tuura  <lat@iki.fi>
+
+	* src/iobase/FileNameLock.cpp, src/iobase/Filename.cpp,
+	src/iobase/LogSocket.cpp, src/iobase/Socket.cpp,
+	src/iobase/TempFile.cpp, src/iobase/UnixFilename.cpp,
+	src/iobase/UnixTempFile.cpp, src/iotools/BufferInputStream.cpp,
+	src/iotools/BufferOutputStream.cpp, src/iotools/PushBackBuffer.cpp,
+	src/iotools/PushBackInputStream.cpp, src/iotools/ReadBuffer.cpp,
+	src/iotools/ReadWriteBuffer.cpp, src/iotools/WriteBuffer.cpp,
+	src/utils/Argz.cpp, src/utils/DebugAids.cpp, src/utils/Error.cpp,
+	src/utils/ProcessInfo.cpp, src/utils/Regexp.cpp,
+	src/utils/ResourceInfo.cpp, src/utils/SharedLibrary.cpp,
+	src/utils/Signal.cpp, src/utils/StringFormat.cpp,
+	src/utils/StringOps.cpp, src/utils/SystemError.cpp,
+	src/utils/SystemInfo.cpp, src/utils/Time.cpp, src/utils/UUID.cpp,
+	src/zip/BZCompressor.cpp, src/zip/BZDecompressor.cpp,
+	src/zip/InteractiveDecompressor.cpp, src/zip/ZCompressor.cpp,
+	src/zip/ZDecompressor.cpp, src/zip/ZipArchive.cpp,
+	src/zip/ZipInputStream.cpp, src/zip/ZipMember.cpp,
+	src/zip/ZipOutputStream.cpp, src/zip/ZipUtils.cpp:
+	Add headers and more helpful braces as indicated by GCC 4.
+
+2008-10-15  Lassi A. Tuura  <lat@iki.fi>
+
+	* cfg/boostrap.sh, config.guess, config.sub, cfg/ltmain.sh:
+	Regenerate using a more recent version of autotools chain.
+
+2008-07-22  Lassi A. Tuura  <lat@iki.fi>
+
+	* src/utils/StringOps.cpp (replace): Advance location by one if an
+	empty regexp match is replaced with an empty replacement string.
+	* test/utils/StringsOps04.cpp: Add a test for said condition.
+
+2008-07-09  Lassi A. Tuura  <lat@iki.fi>
+
+	* StringOps.cpp: Fix buggy use of incorrect separator width in
+	splitting strings with a std::string separator.
+
+2008-07-03  Lassi A. Tuura  <lat@iki.fi>
+
+	* StringOps.h, StringOps.cpp: Support operations on bare C strings
+	as well as std::string.  Allow "first" to be set without "last" in
+	the split() methods.  Fix incorrect string replacements in regular
+	expression replace() methods.
+
+	* Regexp.h, Regexp.cpp: Support operations on just C strings.
+
+	* Makefile.am: Consolidate tests.  Add a target to build just
+	the test programs, without actually running the tests.
+
+	* test/utils/StringFormat*.cpp, test/utils/StringOps*.cpp:
+	Consolidate into fewer tests and VERIFY() test results.  Add
+	some new tests.
+
+	* cfg/bootstrap.sh: Apply more brute force to undo libtool.
+	* cfg/config.guess, cfg/config.sub, cfg/ltmain.sh: Updated.
+
+2008-07-03  Lassi A. Tuura  <lat@iki.fi>
+
+	* cfg/bootstrap.sh: Enable glibtoolize --force on Darwin.
+
+2007-05-14  Lassi A. Tuura  <lat@iki.fi>
+
+	* configure.in: Set version to 3.0.1.
+
+	* cfg/bootstrap.sh: Update to work on Linux as well.
+
+	* Makefile.in, cfg/aclocal.m4, cfg/config.guess, cfg/config.sub,
+	cfg/ltmain.sh, configure: Regenerate using more recent tool chain.
+
+2007-02-26  Lassi A. Tuura  <lat@iki.fi>
+
+	* configure.in: Set version to 3.0.0.
+
+	* cfg/bootstrap.sh: Further clean up libtool nonsense.
+
+	* Makefile.am: Set QUIET_ASSERT in tests.
+
+2007-02-24  Lassi A. Tuura  <lat@iki.fi>
+
+	* Starting new major version of classlib based on last SEAL
+	version.  Converted to build using autotools and updated some
+	external packages.
