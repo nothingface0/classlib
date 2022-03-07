@@ -4,6 +4,6 @@
 # include <cerrno>
 # ifndef _WIN32
 #  include <utmp.h>
-#  include <sys/sysctl.h>
+#  include <linux/sysctl.h>
 # endif
 #endif // CLASSLIB_SYSAPI_FILE_NAME_LOCK_H

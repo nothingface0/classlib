@@ -8,7 +8,7 @@
 # else
 #  include <unistd.h>
 #  include <fcntl.h>
-#  include <sys/sysctl.h>
+#  include <linux/sysctl.h>
 #  include <sys/resource.h>
 #  include <sys/time.h>
 #  include <time.h>
