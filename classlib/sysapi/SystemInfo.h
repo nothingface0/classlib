@@ -7,7 +7,7 @@
 #  include <unistd.h>
 #  include <sys/param.h>
 #  include <sys/utsname.h>
-#  include <sys/sysctl.h>
+#  include <linux/sysctl.h>
 #  if __APPLE__
 #    include <sys/vmmeter.h>
 #  elif BSD > 0
