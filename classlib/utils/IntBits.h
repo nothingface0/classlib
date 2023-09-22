@@ -1,8 +1,17 @@
 #ifndef CLASSLIB_INT_BITS_H
 # define CLASSLIB_INT_BITS_H
-# ifndef __STDC_LIMIT_MACROS
-#  error This header requires __STDC_LIMIT_MACROS to be defined
-# endif
+
+// The __STDC_LIMIT_MACROS needs to be defined such that the nonstdint.h header
+// knows that it has to define the INT<N>_MAX macros itself. However, this is
+// only necessary when using the Microsoft compiler. In the other cases, the
+// nonstdint.h header is just an alias to the system stdint.h, which is where
+// the INT<N>_MAX macros get defined.
+# if _MSC_VER
+#  ifndef __STDC_LIMIT_MACROS
+#   error This header requires __STDC_LIMIT_MACROS to be defined
+#  endif
+# endif // _MSC_VER
+
 # include "classlib/utils/BitTraits.h"
 # include "classlib/sysapi/nonstdint.h"
 
