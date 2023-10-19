@@ -679,7 +679,55 @@ libclasslib_la_SOURCES = \
   src/iobase/SubProcessError.cpp		\
   src/iobase/TempFile.cpp			\
   src/iobase/UnixTempFile.cpp			\
-  src/iobase/WindowsTempFile.cpp
+  src/iobase/WindowsTempFile.cpp		\
+  src/zip/Adler32.cpp				\
+  src/zip/BZCompressor.cpp			\
+  src/zip/BZDecompressor.cpp			\
+  src/zip/BZError.cpp				\
+  src/zip/BZIPInputStream.cpp			\
+  src/zip/BZIPOutputStream.cpp			\
+  src/zip/CPIOConstants.cpp			\
+  src/zip/CPIOError.cpp				\
+  src/zip/CPIOInputStream.cpp			\
+  src/zip/CPIOMember.cpp			\
+  src/zip/CPIOOutputStream.cpp			\
+  src/zip/CRC32.cpp				\
+  src/zip/CheckedInputStream.cpp		\
+  src/zip/CheckedOutputStream.cpp		\
+  src/zip/Checksum.cpp				\
+  src/zip/CompressOutputStream.cpp		\
+  src/zip/Compressor.cpp			\
+  src/zip/DecompressInputStream.cpp		\
+  src/zip/Decompressor.cpp			\
+  src/zip/Digest.cpp				\
+  src/zip/GZIPInputStream.cpp			\
+  src/zip/GZIPOutputStream.cpp			\
+  src/zip/InteractiveCompressor.cpp		\
+  src/zip/InteractiveDecompressor.cpp		\
+  src/zip/LZMACompressor.cpp			\
+  src/zip/LZMADecompressor.cpp			\
+  src/zip/LZMAError.cpp				\
+  src/zip/LZOCompressor.cpp			\
+  src/zip/LZODecompressor.cpp			\
+  src/zip/LZOError.cpp				\
+  src/zip/MD5Digest.cpp				\
+  src/zip/SHA1Digest.cpp			\
+  src/zip/SHA1Error.cpp				\
+  src/zip/TarConstants.cpp			\
+  src/zip/TarError.cpp				\
+  src/zip/TarInputStream.cpp			\
+  src/zip/TarMember.cpp				\
+  src/zip/TarOutputStream.cpp			\
+  src/zip/ZCompressor.cpp			\
+  src/zip/ZDecompressor.cpp			\
+  src/zip/ZError.cpp				\
+  src/zip/ZInputStream.cpp			\
+  src/zip/ZOutputStream.cpp			\
+  src/zip/ZipArchive.cpp			\
+  src/zip/ZipInputStream.cpp			\
+  src/zip/ZipMember.cpp				\
+  src/zip/ZipOutputStream.cpp			\
+  src/zip/ZipUtils.cpp
 
 nobase_include_HEADERS = \
   classlib/sysapi/config.h			\
@@ -937,6 +985,7 @@ classlib_test_SOURCES = \
   test/iobase/SubStorage03.cpp			\
   test/iobase/SubStorage04.cpp			\
   test/iobase/SubStorage05.cpp			\
+
   test/utils/Argz01.cpp				\
   test/utils/AutoLoad01.cpp			\
   test/utils/BitIterator01.cpp			\
@@ -996,7 +1045,7 @@ classlib_test_SOURCES = \
   test/utils/exa_Log.cpp			\
   test/utils/exa_ResourceInfo.cpp		\
   test/utils/exa_Signal.cpp			\
-  test/utils/LogListener.cpp		
+  test/utils/LogListener.cpp			
 
 all: all-am
 
