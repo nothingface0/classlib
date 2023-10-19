@@ -195,7 +195,55 @@ am_libclasslib_la_OBJECTS = src/utils/libclasslib_la-Argz.lo \
 	src/iobase/libclasslib_la-SubProcessError.lo \
 	src/iobase/libclasslib_la-TempFile.lo \
 	src/iobase/libclasslib_la-UnixTempFile.lo \
-	src/iobase/libclasslib_la-WindowsTempFile.lo
+	src/iobase/libclasslib_la-WindowsTempFile.lo \
+	src/zip/libclasslib_la-Adler32.lo \
+	src/zip/libclasslib_la-BZCompressor.lo \
+	src/zip/libclasslib_la-BZDecompressor.lo \
+	src/zip/libclasslib_la-BZError.lo \
+	src/zip/libclasslib_la-BZIPInputStream.lo \
+	src/zip/libclasslib_la-BZIPOutputStream.lo \
+	src/zip/libclasslib_la-CPIOConstants.lo \
+	src/zip/libclasslib_la-CPIOError.lo \
+	src/zip/libclasslib_la-CPIOInputStream.lo \
+	src/zip/libclasslib_la-CPIOMember.lo \
+	src/zip/libclasslib_la-CPIOOutputStream.lo \
+	src/zip/libclasslib_la-CRC32.lo \
+	src/zip/libclasslib_la-CheckedInputStream.lo \
+	src/zip/libclasslib_la-CheckedOutputStream.lo \
+	src/zip/libclasslib_la-Checksum.lo \
+	src/zip/libclasslib_la-CompressOutputStream.lo \
+	src/zip/libclasslib_la-Compressor.lo \
+	src/zip/libclasslib_la-DecompressInputStream.lo \
+	src/zip/libclasslib_la-Decompressor.lo \
+	src/zip/libclasslib_la-Digest.lo \
+	src/zip/libclasslib_la-GZIPInputStream.lo \
+	src/zip/libclasslib_la-GZIPOutputStream.lo \
+	src/zip/libclasslib_la-InteractiveCompressor.lo \
+	src/zip/libclasslib_la-InteractiveDecompressor.lo \
+	src/zip/libclasslib_la-LZMACompressor.lo \
+	src/zip/libclasslib_la-LZMADecompressor.lo \
+	src/zip/libclasslib_la-LZMAError.lo \
+	src/zip/libclasslib_la-LZOCompressor.lo \
+	src/zip/libclasslib_la-LZODecompressor.lo \
+	src/zip/libclasslib_la-LZOError.lo \
+	src/zip/libclasslib_la-MD5Digest.lo \
+	src/zip/libclasslib_la-SHA1Digest.lo \
+	src/zip/libclasslib_la-SHA1Error.lo \
+	src/zip/libclasslib_la-TarConstants.lo \
+	src/zip/libclasslib_la-TarError.lo \
+	src/zip/libclasslib_la-TarInputStream.lo \
+	src/zip/libclasslib_la-TarMember.lo \
+	src/zip/libclasslib_la-TarOutputStream.lo \
+	src/zip/libclasslib_la-ZCompressor.lo \
+	src/zip/libclasslib_la-ZDecompressor.lo \
+	src/zip/libclasslib_la-ZError.lo \
+	src/zip/libclasslib_la-ZInputStream.lo \
+	src/zip/libclasslib_la-ZOutputStream.lo \
+	src/zip/libclasslib_la-ZipArchive.lo \
+	src/zip/libclasslib_la-ZipInputStream.lo \
+	src/zip/libclasslib_la-ZipMember.lo \
+	src/zip/libclasslib_la-ZipOutputStream.lo \
+	src/zip/libclasslib_la-ZipUtils.lo
 libclasslib_la_OBJECTS = $(am_libclasslib_la_OBJECTS)
 libclasslib_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
@@ -263,6 +311,28 @@ am_classlib_test_OBJECTS = classlib_test-TestDriver.$(OBJEXT) \
 	test/iobase/classlib_test-SubStorage03.$(OBJEXT) \
 	test/iobase/classlib_test-SubStorage04.$(OBJEXT) \
 	test/iobase/classlib_test-SubStorage05.$(OBJEXT) \
+	test/iotools/classlib_test-BufferInputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-BufferOutputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-FilterInputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-FilterOutputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-IOChannelInputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-IOChannelOutputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-PipedInputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-PipedOutputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-PushBackInputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-StdInputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-StdInputStream02.$(OBJEXT) \
+	test/iotools/classlib_test-StdOutputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-StdStorage01.$(OBJEXT) \
+	test/iotools/classlib_test-StdStorage02.$(OBJEXT) \
+	test/iotools/classlib_test-StdStorage03.$(OBJEXT) \
+	test/iotools/classlib_test-StdStorage04.$(OBJEXT) \
+	test/iotools/classlib_test-StdioStorage01.$(OBJEXT) \
+	test/iotools/classlib_test-StdioStorage02.$(OBJEXT) \
+	test/iotools/classlib_test-StdioStorage03.$(OBJEXT) \
+	test/iotools/classlib_test-StdioStorage04.$(OBJEXT) \
+	test/iotools/classlib_test-StorageInputStream01.$(OBJEXT) \
+	test/iotools/classlib_test-StorageOutputStream01.$(OBJEXT) \
 	test/utils/classlib_test-Argz01.$(OBJEXT) \
 	test/utils/classlib_test-AutoLoad01.$(OBJEXT) \
 	test/utils/classlib_test-BitIterator01.$(OBJEXT) \
@@ -321,7 +391,7 @@ am_classlib_test_OBJECTS = classlib_test-TestDriver.$(OBJEXT) \
 	test/utils/classlib_test-exa_Log.$(OBJEXT) \
 	test/utils/classlib_test-exa_ResourceInfo.$(OBJEXT) \
 	test/utils/classlib_test-exa_Signal.$(OBJEXT) \
-	test/utils/classlib_test-LogListener.$(OBJEXT)
+	test/utils/classlib_test-LogListener.$(OBJEXT) 
 classlib_test_OBJECTS = $(am_classlib_test_OBJECTS)
 classlib_test_DEPENDENCIES =
 depcomp = $(SHELL) $(top_srcdir)/cfg/depcomp
@@ -740,7 +810,59 @@ nobase_include_HEADERS = \
   classlib/utils/Unwind.h			\
   classlib/utils/UserInfo.h			\
   classlib/utils/XTypeInfo.h			\
-  classlib/utils/iosfwd.h
+  classlib/utils/iosfwd.h			\
+  classlib/zip/Adler32.h			\
+  classlib/zip/BZCompressor.h			\
+  classlib/zip/BZConstants.h			\
+  classlib/zip/BZDecompressor.h			\
+  classlib/zip/BZError.h			\
+  classlib/zip/BZIPInputStream.h		\
+  classlib/zip/BZIPOutputStream.h		\
+  classlib/zip/CPIOConstants.h			\
+  classlib/zip/CPIOError.h			\
+  classlib/zip/CPIOInputStream.h		\
+  classlib/zip/CPIOMember.h			\
+  classlib/zip/CPIOOutputStream.h		\
+  classlib/zip/CRC32.h				\
+  classlib/zip/CheckedInputStream.h		\
+  classlib/zip/CheckedOutputStream.h		\
+  classlib/zip/Checksum.h			\
+  classlib/zip/CompressOutputStream.h		\
+  classlib/zip/Compressor.h			\
+  classlib/zip/DecompressInputStream.h		\
+  classlib/zip/Decompressor.h			\
+  classlib/zip/Digest.h				\
+  classlib/zip/GZIPInputStream.h		\
+  classlib/zip/GZIPOutputStream.h		\
+  classlib/zip/InteractiveCompressor.h		\
+  classlib/zip/InteractiveDecompressor.h	\
+  classlib/zip/LZMACompressor.h			\
+  classlib/zip/LZMAConstants.h			\
+  classlib/zip/LZMADecompressor.h		\
+  classlib/zip/LZMAError.h			\
+  classlib/zip/LZOCompressor.h			\
+  classlib/zip/LZOConstants.h			\
+  classlib/zip/LZODecompressor.h		\
+  classlib/zip/LZOError.h			\
+  classlib/zip/MD5Digest.h			\
+  classlib/zip/SHA1Digest.h			\
+  classlib/zip/SHA1Error.h			\
+  classlib/zip/TarConstants.h			\
+  classlib/zip/TarError.h			\
+  classlib/zip/TarInputStream.h			\
+  classlib/zip/TarMember.h			\
+  classlib/zip/TarOutputStream.h		\
+  classlib/zip/ZCompressor.h			\
+  classlib/zip/ZConstants.h			\
+  classlib/zip/ZDecompressor.h			\
+  classlib/zip/ZError.h				\
+  classlib/zip/ZInputStream.h			\
+  classlib/zip/ZOutputStream.h			\
+  classlib/zip/ZipArchive.h			\
+  classlib/zip/ZipInputStream.h			\
+  classlib/zip/ZipMember.h			\
+  classlib/zip/ZipOutputStream.h		\
+  classlib/zip/ZipUtils.h
 
 TESTS_ENVIRONMENT = QUIET_ASSERT=a
 TESTS = $(check_PROGRAMS)
@@ -874,7 +996,7 @@ classlib_test_SOURCES = \
   test/utils/exa_Log.cpp			\
   test/utils/exa_ResourceInfo.cpp		\
   test/utils/exa_Signal.cpp			\
-  test/utils/LogListener.cpp
+  test/utils/LogListener.cpp		
 
 all: all-am
 

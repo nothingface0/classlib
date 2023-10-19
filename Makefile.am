@@ -115,7 +115,8 @@ libclasslib_la_SOURCES =			\
   src/iobase/SubProcessError.cpp		\
   src/iobase/TempFile.cpp			\
   src/iobase/UnixTempFile.cpp			\
-  src/iobase/WindowsTempFile.cpp
+  src/iobase/WindowsTempFile.cpp	
+  
 
 nobase_include_HEADERS =			\
   classlib/sysapi/config.h			\
@@ -246,7 +247,59 @@ nobase_include_HEADERS =			\
   classlib/utils/Unwind.h			\
   classlib/utils/UserInfo.h			\
   classlib/utils/XTypeInfo.h			\
-  classlib/utils/iosfwd.h
+  classlib/utils/iosfwd.h			\
+  classlib/zip/Adler32.h			\
+  classlib/zip/BZCompressor.h			\
+  classlib/zip/BZConstants.h			\
+  classlib/zip/BZDecompressor.h			\
+  classlib/zip/BZError.h			\
+  classlib/zip/BZIPInputStream.h		\
+  classlib/zip/BZIPOutputStream.h		\
+  classlib/zip/CPIOConstants.h			\
+  classlib/zip/CPIOError.h			\
+  classlib/zip/CPIOInputStream.h		\
+  classlib/zip/CPIOMember.h			\
+  classlib/zip/CPIOOutputStream.h		\
+  classlib/zip/CRC32.h				\
+  classlib/zip/CheckedInputStream.h		\
+  classlib/zip/CheckedOutputStream.h		\
+  classlib/zip/Checksum.h			\
+  classlib/zip/CompressOutputStream.h		\
+  classlib/zip/Compressor.h			\
+  classlib/zip/DecompressInputStream.h		\
+  classlib/zip/Decompressor.h			\
+  classlib/zip/Digest.h				\
+  classlib/zip/GZIPInputStream.h		\
+  classlib/zip/GZIPOutputStream.h		\
+  classlib/zip/InteractiveCompressor.h		\
+  classlib/zip/InteractiveDecompressor.h	\
+  classlib/zip/LZMACompressor.h			\
+  classlib/zip/LZMAConstants.h			\
+  classlib/zip/LZMADecompressor.h		\
+  classlib/zip/LZMAError.h			\
+  classlib/zip/LZOCompressor.h			\
+  classlib/zip/LZOConstants.h			\
+  classlib/zip/LZODecompressor.h		\
+  classlib/zip/LZOError.h			\
+  classlib/zip/MD5Digest.h			\
+  classlib/zip/SHA1Digest.h			\
+  classlib/zip/SHA1Error.h			\
+  classlib/zip/TarConstants.h			\
+  classlib/zip/TarError.h			\
+  classlib/zip/TarInputStream.h			\
+  classlib/zip/TarMember.h			\
+  classlib/zip/TarOutputStream.h		\
+  classlib/zip/ZCompressor.h			\
+  classlib/zip/ZConstants.h			\
+  classlib/zip/ZDecompressor.h			\
+  classlib/zip/ZError.h				\
+  classlib/zip/ZInputStream.h			\
+  classlib/zip/ZOutputStream.h			\
+  classlib/zip/ZipArchive.h			\
+  classlib/zip/ZipInputStream.h			\
+  classlib/zip/ZipMember.h			\
+  classlib/zip/ZipOutputStream.h		\
+  classlib/zip/ZipUtils.h
 
 TESTS_ENVIRONMENT = QUIET_ASSERT=a
 TESTS = $(check_PROGRAMS)
@@ -380,7 +433,8 @@ classlib_test_SOURCES =				\
   test/utils/exa_Log.cpp			\
   test/utils/exa_ResourceInfo.cpp		\
   test/utils/exa_Signal.cpp			\
-  test/utils/LogListener.cpp
+  test/utils/LogListener.cpp	
+
 
 TestDriver.cpp: Makefile
 	@(echo '#include <ctype.h>';				\
