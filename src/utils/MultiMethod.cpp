@@ -1,16 +1,14 @@
 
 #include "classlib/utils/MultiMethod.h"
-#include "classlib/utils/PODVector.h"
 #include "classlib/utils/Log.h"
+#include "classlib/utils/PODVector.h"
 #include <algorithm>
 #include <utility>
-
+#define UNUSED(x) (void)(x)
 namespace lat {
 
 /** The multi-method logging flag. */
-logflag		LFmultimethod = { 0, "multimethod", true, -1 };
-
-
+logflag LFmultimethod = {0, "multimethod", true, -1};
 
 /** Add a new member @a function.
 
@@ -20,39 +18,35 @@ logflag		LFmultimethod = { 0, "multimethod", true, -1 };
     long as this function is a registered member of this family.
 
     Also marks the method dirty.  */
-void
-MultiMethod::Definition::extend (MemberFunction function,
-				 XTypeInfo::ClassDef **formalTypes)
-{
-    ASSERT (function);
-    ASSERT (formalTypes);
+void MultiMethod::Definition::extend(MemberFunction function,
+                                     XTypeInfo::ClassDef **formalTypes) {
+  ASSERT(function);
+  ASSERT(formalTypes);
 
-    Member item = { function, formalTypes };
-    PODVector<Member>::reserve (m_family, INITIAL_FAMILY_SIZE);
-    PODVector<Member>::push_back (m_family, item);
-    m_dirty = true;
+  Member item = {function, formalTypes};
+  PODVector<Member>::reserve(m_family, INITIAL_FAMILY_SIZE);
+  PODVector<Member>::push_back(m_family, item);
+  m_dirty = true;
 #ifndef NLOG
-    if (PODVector<Member>::size (m_family) > m_familyMaxSize)
-	m_familyMaxSize = PODVector<Member>::size (m_family);
-    if (PODVector<Member>::capacity (m_family) > m_familyMaxCapacity)
-	m_familyMaxCapacity = PODVector<Member>::capacity (m_family);
+  if (PODVector<Member>::size(m_family) > m_familyMaxSize)
+    m_familyMaxSize = PODVector<Member>::size(m_family);
+  if (PODVector<Member>::capacity(m_family) > m_familyMaxCapacity)
+    m_familyMaxCapacity = PODVector<Member>::capacity(m_family);
 #endif
 }
 
 /** Remove a member @a function from the family.  */
-void
-MultiMethod::Definition::remove (MemberFunction function)
-{
-    ASSERT (function);
+void MultiMethod::Definition::remove(MemberFunction function) {
+  ASSERT(function);
 
-    PODVector<Member>::iterator pos = PODVector<Member>::begin (m_family);
-    PODVector<Member>::iterator end = PODVector<Member>::end (m_family);
-    while (pos != end && pos->m_function != function)
-	++pos;
+  PODVector<Member>::iterator pos = PODVector<Member>::begin(m_family);
+  PODVector<Member>::iterator end = PODVector<Member>::end(m_family);
+  while (pos != end && pos->m_function != function)
+    ++pos;
 
-    ASSERT (pos != end);
-    PODVector<Member>::erase (m_family, pos);
-    m_dirty = true;
+  ASSERT(pos != end);
+  PODVector<Member>::erase(m_family, pos);
+  m_dirty = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -62,34 +56,30 @@ MultiMethod::Definition::remove (MemberFunction function)
 /** Allocate a new hunk of scores.  We allocate a vector of @a min or
     #SCORE_HUNK_SIZE contiguous scores, which ever is more.  */
 inline MultiMethod::ScoreHunk *
-MultiMethod::createScoreHunk (std::size_t min) const
-{
-    if (min < SCORE_HUNK_SIZE)
-	min = SCORE_HUNK_SIZE;
-    ScoreHunk *hunk = new ScoreHunk;
-    hunk->m_free = hunk->m_scores = new Score [min];
-    hunk->m_capacity = min;
-    hunk->m_next = m_data->m_scoreHunks;
-    m_data->m_scoreHunks = hunk;
-    return hunk;
+MultiMethod::createScoreHunk(std::size_t min) const {
+  if (min < SCORE_HUNK_SIZE)
+    min = SCORE_HUNK_SIZE;
+  ScoreHunk *hunk = new ScoreHunk;
+  hunk->m_free = hunk->m_scores = new Score[min];
+  hunk->m_capacity = min;
+  hunk->m_next = m_data->m_scoreHunks;
+  m_data->m_scoreHunks = hunk;
+  return hunk;
 }
 
 /** Ditch all scores.  */
-void
-MultiMethod::freeScoreHunks (void) const
-{
-    ScoreHunk *hunk = m_data->m_scoreHunks;
-    ScoreHunk *next;
+void MultiMethod::freeScoreHunks(void) const {
+  ScoreHunk *hunk = m_data->m_scoreHunks;
+  ScoreHunk *next;
 
-    while (hunk)
-    {
-	next = hunk->m_next;
-	delete [] hunk->m_scores;
-	delete hunk;
-	hunk = next;
-    }
+  while (hunk) {
+    next = hunk->m_next;
+    delete[] hunk->m_scores;
+    delete hunk;
+    hunk = next;
+  }
 
-    m_data->m_scoreHunks = 0;
+  m_data->m_scoreHunks = 0;
 }
 
 /** Allocate a contiguous vector of at least @a n scores.  If we can't
@@ -100,20 +90,17 @@ MultiMethod::freeScoreHunks (void) const
     that scores are never freed individually, we always invalidate all
     scores for this method family (see #regenerate() and
     #freeScoreHunks()).  */
-inline MultiMethod::Score *
-MultiMethod::allocateScores (std::size_t n) const
-{
-    ScoreHunk	*hunk = m_data->m_scoreHunks
-			? m_data->m_scoreHunks
-			: createScoreHunk (n);
-    Score	*scores;
-    if (hunk->m_capacity < n)
-	hunk = createScoreHunk (n);
+inline MultiMethod::Score *MultiMethod::allocateScores(std::size_t n) const {
+  ScoreHunk *hunk =
+      m_data->m_scoreHunks ? m_data->m_scoreHunks : createScoreHunk(n);
+  Score *scores;
+  if (hunk->m_capacity < n)
+    hunk = createScoreHunk(n);
 
-    scores = hunk->m_free;
-    hunk->m_free += n;
-    hunk->m_capacity -= n;
-    return scores;
+  scores = hunk->m_free;
+  hunk->m_free += n;
+  hunk->m_capacity -= n;
+  return scores;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -121,61 +108,52 @@ MultiMethod::allocateScores (std::size_t n) const
     allocated individually, there is no waste and no need to indicate
     how many are required.  We allocate them #ENTRY_HUNK_SIZE at a
     time.  */
-inline MultiMethod::EntryHunk *
-MultiMethod::createEntryHunk (void) const
-{
-    EntryHunk *hunk = new EntryHunk;
-    hunk->m_next = m_data->m_entryHunks;
-    hunk->m_free = hunk->m_entries = new Entry [ENTRY_HUNK_SIZE];
-    hunk->m_capacity = ENTRY_HUNK_SIZE;
-    m_data->m_entryHunks = hunk;
-    return hunk;
+inline MultiMethod::EntryHunk *MultiMethod::createEntryHunk(void) const {
+  EntryHunk *hunk = new EntryHunk;
+  hunk->m_next = m_data->m_entryHunks;
+  hunk->m_free = hunk->m_entries = new Entry[ENTRY_HUNK_SIZE];
+  hunk->m_capacity = ENTRY_HUNK_SIZE;
+  m_data->m_entryHunks = hunk;
+  return hunk;
 }
 
 /** Ditch all entries.  Note that the entries on the free list just
     point to entries within hunks, this is where the free list is
     actually getting cleared and freed back to the system.  */
-void
-MultiMethod::freeEntryHunks (void) const
-{
-    EntryHunk *hunk = m_data->m_entryHunks;
-    EntryHunk *next;
+void MultiMethod::freeEntryHunks(void) const {
+  EntryHunk *hunk = m_data->m_entryHunks;
+  EntryHunk *next;
 
-    while (hunk)
-    {
-	next = hunk->m_next;
-	delete [] hunk->m_entries;
-	delete hunk;
-	hunk = next;
-    }
+  while (hunk) {
+    next = hunk->m_next;
+    delete[] hunk->m_entries;
+    delete hunk;
+    hunk = next;
+  }
 
-    m_data->m_entryHunks = 0;
-    m_data->m_freeEntries = 0;
+  m_data->m_entryHunks = 0;
+  m_data->m_freeEntries = 0;
 }
 
 /** Allocate a new #Entry.  Picks one off the free list if that list
     is non-empty (see #freeEntry()), failing that one from the last
     entry hunk, and failing that allocates a new hunk and allocates
     one from it.  */
-inline MultiMethod::Entry *
-MultiMethod::allocateEntry (void) const
-{
-    Entry *item = m_data->m_freeEntries;
-    if (item)
-	m_data->m_freeEntries = item->m_next;
-    else
-    {
-	EntryHunk *hunk = m_data->m_entryHunks
-			  ? m_data->m_entryHunks
-			  : createEntryHunk ();
+inline MultiMethod::Entry *MultiMethod::allocateEntry(void) const {
+  Entry *item = m_data->m_freeEntries;
+  if (item)
+    m_data->m_freeEntries = item->m_next;
+  else {
+    EntryHunk *hunk =
+        m_data->m_entryHunks ? m_data->m_entryHunks : createEntryHunk();
 
-	if (hunk->m_capacity == 0)
-	    hunk = createEntryHunk ();
+    if (hunk->m_capacity == 0)
+      hunk = createEntryHunk();
 
-	hunk->m_capacity--;
-	item = hunk->m_free++;
-    }
-    return item;
+    hunk->m_capacity--;
+    item = hunk->m_free++;
+  }
+  return item;
 }
 
 /** Mark an #Entry @a item free.
@@ -185,7 +163,7 @@ MultiMethod::allocateEntry (void) const
     to put the record on a free list, where we can pick it up when we
     need a a new one.  We use the chains in the #Entry record to chain
     the free list, hence won't use any extra space for the list.
-   
+
     Note that this freeing behaviour is deliberate---new entries are
     allocated for new types and freed when the type leaves the system
     (e.g. when loading and unloading shared libraries, respectively).
@@ -198,11 +176,9 @@ MultiMethod::allocateEntry (void) const
     them in a free list (which has uses when a system is legitimately
     loading and unloading shared libraries, e.g. to cache plug-in
     features).  */
-inline void
-MultiMethod::freeEntry (Entry *item) const
-{
-    item->m_next = m_data->m_freeEntries;
-    m_data->m_freeEntries = item;
+inline void MultiMethod::freeEntry(Entry *item) const {
+  item->m_next = m_data->m_freeEntries;
+  m_data->m_freeEntries = item;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -217,18 +193,16 @@ MultiMethod::freeEntry (Entry *item) const
     would however also create longer extension vectors in @em every
     type, not just the ones we touch, and hence the space optimisation
     here at the expense of speed.
-   
+
     This method exists solely to avoid initialisation ordering issues.
     The key will simply get allocated the first time something
     somewhere needs it; it is safe to be used in static constructors
     regardless of the order in which objects are initialised.  */
-XTypeInfo::ExtensionKey
-MultiMethod::extensionKey (void)
-{
-    // FIXME: thread safety!
-    static XTypeInfo::ExtensionKey key = XTypeInfo::allocateExtension ();
+XTypeInfo::ExtensionKey MultiMethod::extensionKey(void) {
+  // FIXME: thread safety!
+  static XTypeInfo::ExtensionKey key = XTypeInfo::allocateExtension();
 
-    return key;
+  return key;
 }
 
 /** Allocate a key (an index) for this multi-method.  The key is used
@@ -237,11 +211,9 @@ MultiMethod::extensionKey (void)
     in the same #XTypeInfo extension (see #extensionKey() and #Entry).
     Eeach method in the running system hence gets a unique key in the
     order in which the method constructors happen to run.  */
-std::size_t
-MultiMethod::methodKey (void)
-{
-    static std::size_t key = 0;
-    return ++key;
+std::size_t MultiMethod::methodKey(void) {
+  static std::size_t key = 0;
+  return ++key;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -252,69 +224,61 @@ MultiMethod::methodKey (void)
     the required information but has to prepare the information in
     ways more complex than what is possible in the constructor
     invocation.  */
-MultiMethod::MultiMethod (void)
-    : m_data (0)
-{}
+MultiMethod::MultiMethod(void) : m_data(0) {}
 
 /* Destruct the multi-method.  Disengage myself from the #XTypeInfo
    monitoring hooks (and clean up #Entry records allocated for
    participating types), print out debugging statistics about the
    usage of this method, free all our allocated data and restore the
    static #Definition data to a state where it can be reinitialised.  */
-MultiMethod::~MultiMethod (void)
-{
-    if (m_data && m_data->m_hooked)
-    {
-	// Mark us disengaged to avoid recursion inside typeUnhook.
-	m_data->m_hooked = false;
-	XTypeInfo::removeMonitor (this, true);
-    }
+MultiMethod::~MultiMethod(void) {
+  if (m_data && m_data->m_hooked) {
+    // Mark us disengaged to avoid recursion inside typeUnhook.
+    m_data->m_hooked = false;
+    XTypeInfo::removeMonitor(this, true);
+  }
 
 #ifndef NLOG
-    if (m_data)
-    {
-	std::pair<std::size_t,std::size_t>	scores (0, 0);
-	std::pair<std::size_t,std::size_t>	entries (0, 0);
-	std::size_t				free = 0;
+  if (m_data) {
+    std::pair<std::size_t, std::size_t> scores(0, 0);
+    std::pair<std::size_t, std::size_t> entries(0, 0);
+    std::size_t free = 0;
 
-	for (ScoreHunk *h = m_data->m_scoreHunks; h; h = h->m_next)
-	{
-	    scores.first += (h->m_free + h->m_capacity - h->m_scores);
-	    scores.second += (h->m_free - h->m_scores);
-	}
-	for (EntryHunk *h = m_data->m_entryHunks; h; h = h->m_next)
-	{
-	    entries.first += (h->m_free + h->m_capacity - h->m_entries);
-	    entries.second += (h->m_free - h->m_entries);
-	}
-	for (Entry *f = m_data->m_freeEntries; f; f = f->m_next)
-	    ++free;
-
-	LOG (0, trace, LFmultimethod,
-	     "statistics for `" << m_data->m_name << '\'' << indent
-	     << "\nscores:      allocated = " << scores.first
-	     << " used = " << scores.second
-	     << "\nentries:     allocated = " << entries.first
-	     << " used = " << entries.second
-	     << " free = " << free
-	     << "\nmax members: allocated = " << m_data->m_familyMaxCapacity
-	     << " used = " << m_data->m_familyMaxSize
-	     << '\n' << undent);
+    for (ScoreHunk *h = m_data->m_scoreHunks; h; h = h->m_next) {
+      scores.first += (h->m_free + h->m_capacity - h->m_scores);
+      scores.second += (h->m_free - h->m_scores);
     }
+    for (EntryHunk *h = m_data->m_entryHunks; h; h = h->m_next) {
+      entries.first += (h->m_free + h->m_capacity - h->m_entries);
+      entries.second += (h->m_free - h->m_entries);
+    }
+    for (Entry *f = m_data->m_freeEntries; f; f = f->m_next)
+      ++free;
+
+    LOG(0, trace, LFmultimethod,
+        "statistics for `" << m_data->m_name << '\'' << indent
+                           << "\nscores:      allocated = " << scores.first
+                           << " used = " << scores.second
+                           << "\nentries:     allocated = " << entries.first
+                           << " used = " << entries.second << " free = " << free
+                           << "\nmax members: allocated = "
+                           << m_data->m_familyMaxCapacity
+                           << " used = " << m_data->m_familyMaxSize << '\n'
+                           << undent);
+  }
 #endif // !NLOG
 
-    freeEntryHunks ();
-    freeScoreHunks ();
+  freeEntryHunks();
+  freeScoreHunks();
 
-    if (m_data)
-    {
-	m_data->m_generation = 0;
-	m_data->m_key = 0;
-	m_data->m_formals = 0;
-	m_data->m_formalTypes = 0;
-	m_data->m_familyMaxSize = 0;
-	m_data->m_familyMaxCapacity = 0;
-    }
+  if (m_data) {
+    m_data->m_generation = 0;
+    m_data->m_key = 0;
+    m_data->m_formals = 0;
+    m_data->m_formalTypes = 0;
+    m_data->m_familyMaxSize = 0;
+    m_data->m_familyMaxCapacity = 0;
+  }
 }
 
 /** Initialise the multi-method.
@@ -337,7 +301,7 @@ MultiMethod::~MultiMethod (void)
     would no longer have the problem of having to manufacture an
     invalid XTypeInfo on xtypeid, nor the ugliness of exposing the
     internal details to use ClassDefs.)
-   
+
     Note that the formal argument types may still be incomplete at
     this point (as in not initialised in #XTypeInfo yet), hence we
     are not yet doing anything with them at this point.  Neither are
@@ -345,33 +309,31 @@ MultiMethod::~MultiMethod (void)
     on the first #dispatch() call.  This avoids creating the per-type
     #Entry records until we actually need them, especially in the case
     we don't get called at all.  */
-void
-MultiMethod::initialise (Definition *data, std::size_t formals,
-			 XTypeInfo::ClassDef **formalTypes)
-{
-    ASSERT (! m_data);
+void MultiMethod::initialise(Definition *data, std::size_t formals,
+                             XTypeInfo::ClassDef **formalTypes) {
+  ASSERT(!m_data);
 
-    ASSERT (data);
-    ASSERT (formals > 0);
-    ASSERT (formalTypes);
+  ASSERT(data);
+  ASSERT(formals > 0);
+  ASSERT(formalTypes);
 
-    ASSERT (data->m_key == 0);
-    ASSERT (data->m_hooked == false);
-    ASSERT (data->m_generation == 0);
-    ASSERT (data->m_formals == 0);
-    ASSERT (data->m_formalTypes == 0);
-    ASSERT (data->m_scoreHunks == 0);
-    ASSERT (data->m_entryHunks == 0);
-    ASSERT (data->m_freeEntries == 0);
+  ASSERT(data->m_key == 0);
+  ASSERT(data->m_hooked == false);
+  ASSERT(data->m_generation == 0);
+  ASSERT(data->m_formals == 0);
+  ASSERT(data->m_formalTypes == 0);
+  ASSERT(data->m_scoreHunks == 0);
+  ASSERT(data->m_entryHunks == 0);
+  ASSERT(data->m_freeEntries == 0);
 
-    m_data = data;
-    data->m_key = methodKey ();
-    data->m_formals = formals;
-    data->m_formalTypes = formalTypes;
-    data->m_dirty = true;
+  m_data = data;
+  data->m_key = methodKey();
+  data->m_formals = formals;
+  data->m_formalTypes = formalTypes;
+  data->m_dirty = true;
 
-    for (std::size_t formal = 0; formal < formals; ++formal)
-	ASSERT (data->m_formalTypes [formal]);
+  for (std::size_t formal = 0; formal < formals; ++formal)
+    ASSERT(data->m_formalTypes[formal]);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -380,28 +342,25 @@ MultiMethod::initialise (Definition *data, std::size_t formals,
     that is, either is or inherits from one of them.  Returns the
     index of the first formal argument position in which the type is
     related, or #Definition::m_formals plus one.  */
-inline std::size_t
-MultiMethod::relatedFormal (const XTypeInfo *type) const
-{
-    // FIXME: when destructors run, type might not be complete any
-    // more?  happens on sun, assertion below triggers
+inline std::size_t MultiMethod::relatedFormal(const XTypeInfo *type) const {
+  // FIXME: when destructors run, type might not be complete any
+  // more?  happens on sun, assertion below triggers
 
-    bool related = false;
-    std::size_t formal = 0;
-    for ( ; !related && formal < m_data->m_formals; ++formal)
-    {
-	// formal XTypeInfo must be complete now
-	ASSERT (m_data->m_formalTypes [formal]->m_types);
-	// FIXME: Does this work in the presence of several XTypeInfos
-	//        registered for the same type?  We must be sure to always
-	//        deal with the single instance, or accept them all; in
-	//        particular, if a shared library A is loaded, then B, then
-	//        A unloaded, we must be able to still do the right thing...
-	related = (type == m_data->m_formalTypes [formal]->m_types
-		   || type->hasBase (m_data->m_formalTypes [formal]->m_types));
-    }
+  bool related = false;
+  std::size_t formal = 0;
+  for (; !related && formal < m_data->m_formals; ++formal) {
+    // formal XTypeInfo must be complete now
+    ASSERT(m_data->m_formalTypes[formal]->m_types);
+    // FIXME: Does this work in the presence of several XTypeInfos
+    //        registered for the same type?  We must be sure to always
+    //        deal with the single instance, or accept them all; in
+    //        particular, if a shared library A is loaded, then B, then
+    //        A unloaded, we must be able to still do the right thing...
+    related = (type == m_data->m_formalTypes[formal]->m_types ||
+               type->hasBase(m_data->m_formalTypes[formal]->m_types));
+  }
 
-    return related ? formal-1 : formal;
+  return related ? formal - 1 : formal;
 }
 
 /** Find the #Entry chain for this method in the @a type.
@@ -435,27 +394,21 @@ MultiMethod::relatedFormal (const XTypeInfo *type) const
     (i.e. is, or is inherited from) to the method formal argument at
     that position.  */
 inline MultiMethod::Entry *
-MultiMethod::findTypeEntries (const XTypeInfo *type,
-			      Entry		*&previous,
-			      std::size_t	key,
-			      std::size_t	formal /* = std::size_t(-1) */)
-{
-    Entry *item = static_cast<Entry *> (type->getExtension (extensionKey()));
-    while (item
-	   && (item->m_key < key
-	       || (item->m_key == key
-		   && item->m_formal < formal
-		   && formal != std::size_t(-1))))
-    {
-	previous = item;
-	item = item->m_next;
-    }
+MultiMethod::findTypeEntries(const XTypeInfo *type, Entry *&previous,
+                             std::size_t key,
+                             std::size_t formal /* = std::size_t(-1) */) {
+  Entry *item = static_cast<Entry *>(type->getExtension(extensionKey()));
+  while (item &&
+         (item->m_key < key || (item->m_key == key && item->m_formal < formal &&
+                                formal != std::size_t(-1)))) {
+    previous = item;
+    item = item->m_next;
+  }
 
-    return (item
-	    && item->m_key == key
-	    && (formal == std::size_t(-1)
-		|| item->m_formal == formal))
-	? item : 0;
+  return (item && item->m_key == key &&
+          (formal == std::size_t(-1) || item->m_formal == formal))
+             ? item
+             : 0;
 }
 
 /** Create an #Entry chain in @a type for all the formal argument
@@ -469,87 +422,75 @@ MultiMethod::findTypeEntries (const XTypeInfo *type,
     use of this entry in dispatching.  That is, we don't provide the
     scores at this point, only the #Entry to simplify look up logic
     during #dispatch().  */
-void
-MultiMethod::typePrepare (std::size_t formal, XTypeInfo *type) const
-{
-    ASSERT (type);
-    ASSERT (formal < m_data->m_formals);
+void MultiMethod::typePrepare(std::size_t formal, XTypeInfo *type) const {
+  ASSERT(type);
+  ASSERT(formal < m_data->m_formals);
 
-    Entry *previous = 0;
-    Entry *first = findTypeEntries (type, previous, m_data->m_key);
-    ASSERT (! first);
+  Entry *previous = 0;
+  Entry *first = findTypeEntries(type, previous, m_data->m_key);
+  ASSERT(!first);
 
-    if (first)
-    {
-	// FIXME: can this ever happen?  shouldn't we prepare the type only
-	// once ever?
+  if (first) {
+    // FIXME: can this ever happen?  shouldn't we prepare the type only
+    // once ever?
 #ifndef NDEBUG
-        ASSERT (! previous || previous->m_next == first);
-        ASSERT (first->m_key == m_data->m_key);
-	ASSERT (first->m_formal == formal);
-	ASSERT (first->m_generation <= m_data->m_generation);
-	while (++formal < m_data->m_formals)
-	{
-	    // FIXME: Does this work in the presence of several XTypeInfos
-	    //        registered for the same type?  We must be sure to always
-	    //        deal with the single instance, or accept them all; in
-	    //        particular, if a shared library A is loaded, then B, then
-	    //        A unloaded, we must be able to still do the right thing...
-	    if (type == m_data->m_formalTypes [formal]->m_types
-		|| type->hasBase (m_data->m_formalTypes [formal]->m_types))
-	    {
-		first = first->m_next;
-	        ASSERT (first);
-		ASSERT (first->m_key == m_data->m_key);
-		ASSERT (first->m_formal == formal);
-		ASSERT (first->m_generation <= m_data->m_generation);
-	    }
-	}
-	ASSERT (! first->m_next || first->m_next->m_key > m_data->m_key);
+    ASSERT(!previous || previous->m_next == first);
+    ASSERT(first->m_key == m_data->m_key);
+    ASSERT(first->m_formal == formal);
+    ASSERT(first->m_generation <= m_data->m_generation);
+    while (++formal < m_data->m_formals) {
+      // FIXME: Does this work in the presence of several XTypeInfos
+      //        registered for the same type?  We must be sure to always
+      //        deal with the single instance, or accept them all; in
+      //        particular, if a shared library A is loaded, then B, then
+      //        A unloaded, we must be able to still do the right thing...
+      if (type == m_data->m_formalTypes[formal]->m_types ||
+          type->hasBase(m_data->m_formalTypes[formal]->m_types)) {
+        first = first->m_next;
+        ASSERT(first);
+        ASSERT(first->m_key == m_data->m_key);
+        ASSERT(first->m_formal == formal);
+        ASSERT(first->m_generation <= m_data->m_generation);
+      }
+    }
+    ASSERT(!first->m_next || first->m_next->m_key > m_data->m_key);
 #endif // !NDEBUG
+  } else {
+    first = allocateEntry();
+    if (!previous) {
+      first->m_next = static_cast<Entry *>(type->getExtension(extensionKey()));
+      VERIFY(type->setExtension(extensionKey(), first) == first->m_next);
+    } else {
+      first->m_next = previous->m_next;
+      previous->m_next = first;
     }
-    else
-    {
-        first = allocateEntry ();
-        if (! previous)
-	{
-	    first->m_next = static_cast<Entry *> (type->getExtension (extensionKey ()));
-	    VERIFY (type->setExtension (extensionKey (), first) == first->m_next);
-	}
-	else
-	{
-	    first->m_next = previous->m_next;
-	    previous->m_next = first;
-	}
 
-	first->m_key = m_data->m_key;
-	first->m_formal = formal;
-	first->m_generation = 0;
-	first->m_scores = 0; 
-	previous = first;
+    first->m_key = m_data->m_key;
+    first->m_formal = formal;
+    first->m_generation = 0;
+    first->m_scores = 0;
+    previous = first;
 
-	while (++formal < m_data->m_formals)
-	{
-	    // FIXME: Does this work in the presence of several XTypeInfos
-	    //        registered for the same type?  We must be sure to always
-	    //        deal with the single instance, or accept them all; in
-	    //        particular, if a shared library A is loaded, then B, then
-	    //        A unloaded, we must be able to still do the right thing...
-	    if (type == m_data->m_formalTypes [formal]->m_types
-		|| type->hasBase (m_data->m_formalTypes [formal]->m_types))
-	    {
-	        Entry *item = allocateEntry ();
-		item->m_next = previous->m_next;
-		item->m_key = m_data->m_key;
-		item->m_formal = formal;
-		item->m_generation = 0;
-		item->m_scores = 0;
+    while (++formal < m_data->m_formals) {
+      // FIXME: Does this work in the presence of several XTypeInfos
+      //        registered for the same type?  We must be sure to always
+      //        deal with the single instance, or accept them all; in
+      //        particular, if a shared library A is loaded, then B, then
+      //        A unloaded, we must be able to still do the right thing...
+      if (type == m_data->m_formalTypes[formal]->m_types ||
+          type->hasBase(m_data->m_formalTypes[formal]->m_types)) {
+        Entry *item = allocateEntry();
+        item->m_next = previous->m_next;
+        item->m_key = m_data->m_key;
+        item->m_formal = formal;
+        item->m_generation = 0;
+        item->m_scores = 0;
 
-		previous->m_next = item;
-		previous = item;	
-	    }
-	}
+        previous->m_next = item;
+        previous = item;
+      }
     }
+  }
 }
 
 /** Remove all #Entry records chained in @a type for this multi-method.
@@ -561,46 +502,42 @@ MultiMethod::typePrepare (std::size_t formal, XTypeInfo *type) const
     itself.
 
     Returns true if the type was one of the formal argument types.  */
-bool
-MultiMethod::typeClean (std::size_t formal, XTypeInfo *type) const
-{
-    ASSERT (type);
-    ASSERT (formal < m_data->m_formals);
+bool MultiMethod::typeClean(std::size_t formal, XTypeInfo *type) const {
+  ASSERT(type);
+  ASSERT(formal < m_data->m_formals);
 
-    Entry *previous = 0;
-    Entry *first = findTypeEntries (type, previous, m_data->m_key);
+  Entry *previous = 0;
+  Entry *first = findTypeEntries(type, previous, m_data->m_key);
 
-    if (! first)
-    {
-	// We've already cleaned this type---we are in recursive clean.
-	ASSERT (! m_data->m_hooked);
-	return false;
-    }
+  if (!first) {
+    // We've already cleaned this type---we are in recursive clean.
+    ASSERT(!m_data->m_hooked);
+    return false;
+  }
 
-    ASSERT (! previous || previous->m_next == first);
-    ASSERT (first->m_key == m_data->m_key);
-    ASSERT (first->m_formal == formal);
-    ASSERT (first->m_generation <= m_data->m_generation);
+  ASSERT(!previous || previous->m_next == first);
+  ASSERT(first->m_key == m_data->m_key);
+  ASSERT(first->m_formal == formal);
+  ASSERT(first->m_generation <= m_data->m_generation);
 
-    bool argtype = false;
-    for (Entry *next; first && first->m_key == m_data->m_key; first = next)
-    {
-	// FIXME: Does this work in the presence of several XTypeInfos
-	//        registered for the same type?  We must be sure to always
-	//        deal with the single instance, or accept them all; in
-	//        particular, if a shared library A is loaded, then B, then
-	//        A unloaded, we must be able to still do the right thing...
-	argtype = (argtype || type == m_data->m_formalTypes[formal]->m_types);
-	next = first->m_next;
-	freeEntry (first);
-    }
+  bool argtype = false;
+  for (Entry *next; first && first->m_key == m_data->m_key; first = next) {
+    // FIXME: Does this work in the presence of several XTypeInfos
+    //        registered for the same type?  We must be sure to always
+    //        deal with the single instance, or accept them all; in
+    //        particular, if a shared library A is loaded, then B, then
+    //        A unloaded, we must be able to still do the right thing...
+    argtype = (argtype || type == m_data->m_formalTypes[formal]->m_types);
+    next = first->m_next;
+    freeEntry(first);
+  }
 
-    if (! previous)
-	VERIFY (type->setExtension (extensionKey (), first) != 0);
-    else
-	previous->m_next = first;
+  if (!previous)
+    VERIFY(type->setExtension(extensionKey(), first) != 0);
+  else
+    previous->m_next = first;
 
-    return argtype;
+  return argtype;
 }
 
 /** Make sure @a type is ready to participate in this multi-method:
@@ -614,33 +551,27 @@ MultiMethod::typeClean (std::size_t formal, XTypeInfo *type) const
     new types enter the running system (e.g. when shared libraries are
     loaded).  We add the chain only to the types that are related to
     the formal arguments of this multi-method.  */
-void
-MultiMethod::typeHook (XTypeInfo *type)
-{
-    std::size_t formal = relatedFormal (type);
-    if (formal != m_data->m_formals)
-	typePrepare (formal, type);
+void MultiMethod::typeHook(XTypeInfo *type) {
+  std::size_t formal = relatedFormal(type);
+  if (formal != m_data->m_formals)
+    typePrepare(formal, type);
 }
 
 /** Disable the @a type from participation in this multi-method: free
     the chain of its #Entry records for this multi-method.  Done to
     clean up a type that is about to exit the system.  */
-void
-MultiMethod::typeUnhook (XTypeInfo *type)
-{
-    std::size_t formal = relatedFormal (type);
-    if (formal != m_data->m_formals
-	&& typeClean (formal, type)
-	&& m_data->m_hooked)
-    {
-	// We are still hooked as a monitor (and not yet even in the
-	// process of disengaging), and one of our formal arguments
-	// went away.  So unhook ourselves from all types right now.
-	// Mark us unhooked first to notify recursive calls of this
-	// function that we are already in the process if disengaging.
-	m_data->m_hooked = false;
-	XTypeInfo::removeMonitor (this, true);
-    }
+void MultiMethod::typeUnhook(XTypeInfo *type) {
+  std::size_t formal = relatedFormal(type);
+  if (formal != m_data->m_formals && typeClean(formal, type) &&
+      m_data->m_hooked) {
+    // We are still hooked as a monitor (and not yet even in the
+    // process of disengaging), and one of our formal arguments
+    // went away.  So unhook ourselves from all types right now.
+    // Mark us unhooked first to notify recursive calls of this
+    // function that we are already in the process if disengaging.
+    m_data->m_hooked = false;
+    XTypeInfo::removeMonitor(this, true);
+  }
 }
 
 /** Clean up the dispatch scores for @a type and anything inheriting
@@ -653,34 +584,31 @@ MultiMethod::typeUnhook (XTypeInfo *type)
     only when the generation counter wraps, making the counter in the
     #Entry records unreliable.  So what we do here is a master reset
     to avoid reusing old scores.  */
-void
-MultiMethod::cleanScores (const XTypeInfo *type) const
-{
-    Entry *previous = 0;
-    Entry *first = findTypeEntries (type, previous, m_data->m_key);
-    
-    ASSERT (first);
-    ASSERT (! previous || previous->m_next == first);
-    ASSERT (first->m_key == m_data->m_key);
+void MultiMethod::cleanScores(const XTypeInfo *type) const {
+  Entry *previous = 0;
+  Entry *first = findTypeEntries(type, previous, m_data->m_key);
 
-    for ( ; first && first->m_key == m_data->m_key; first = first->m_next)
-    {
-	first->m_generation = 0;
-	first->m_scores = 0;
-    }
+  ASSERT(first);
+  ASSERT(!previous || previous->m_next == first);
+  ASSERT(first->m_key == m_data->m_key);
 
-    using std::rel_ops::operator!=;
+  for (; first && first->m_key == m_data->m_key; first = first->m_next) {
+    first->m_generation = 0;
+    first->m_scores = 0;
+  }
 
-    XTypeInfo::DerivedIterator start = type->beginDerived ();
-    XTypeInfo::DerivedIterator end = type->endDerived ();
-    for ( ; start != end; ++start)
-	cleanScores (*start);
+  using std::rel_ops::operator!=;
+
+  XTypeInfo::DerivedIterator start = type->beginDerived();
+  XTypeInfo::DerivedIterator end = type->endDerived();
+  for (; start != end; ++start)
+    cleanScores(*start);
 }
 
 /** Compare scores for sorting (by inheritance distance).  */
-inline bool
-MultiMethod::orderScores (const Score &x, const Score &y)
-{ return x.m_distance < y.m_distance; }
+inline bool MultiMethod::orderScores(const Score &x, const Score &y) {
+  return x.m_distance < y.m_distance;
+}
 
 /** Build the dispatch score vector for @a type for each argument
     position where @a type is related to the formal arguments.
@@ -707,158 +635,149 @@ MultiMethod::orderScores (const Score &x, const Score &y)
     the vector exists, its last entry will be an extra sentinel with
     #LAST_SCORE member index and #INFINITE_DISTANCE inheritance
     distance.  */
-void
-MultiMethod::buildScores (const XTypeInfo *type) const
-{
-    LOG (0, trace, LFmultimethod, " " << type->standard ().name ());
+void MultiMethod::buildScores(const XTypeInfo *type) const {
+  LOG(0, trace, LFmultimethod, " " << type->standard().name());
 
-    Entry *item = 0;
-    Entry *previous = 0;
+  Entry *item = 0;
+  Entry *previous = 0;
 
-    // NB: all the base classes have there scores built by now
+  // NB: all the base classes have there scores built by now
 
-    // This type's entries are in a linked list, ordered by key and
-    // formal.  Start building score tables for each formal position
-    // in which this type participates.  We do this in two passes:
-    // first to count how many scores will be need and the second time
-    // to allocate, collect and sort them.  We also remember whether
-    // there were fuctions specific to this type; if not we can try to
-    // optimise the simple case where the class has just one base type
-    // participating in this method -- and we can just use the scores
-    // from the base.
-    //
-    // The last score in the score array will be given LAST_SCORE
-    // index, INFINITE_DISTANCE distance.  The method may not have
-    // that many functions and the type not that distant base classes,
-    // respectively.  However, we only build the score tables if there
-    // is a function that applies in that formal argument position.
-    item = findTypeEntries (type, previous, m_data->m_key);
+  // This type's entries are in a linked list, ordered by key and
+  // formal.  Start building score tables for each formal position
+  // in which this type participates.  We do this in two passes:
+  // first to count how many scores will be need and the second time
+  // to allocate, collect and sort them.  We also remember whether
+  // there were fuctions specific to this type; if not we can try to
+  // optimise the simple case where the class has just one base type
+  // participating in this method -- and we can just use the scores
+  // from the base.
+  //
+  // The last score in the score array will be given LAST_SCORE
+  // index, INFINITE_DISTANCE distance.  The method may not have
+  // that many functions and the type not that distant base classes,
+  // respectively.  However, we only build the score tables if there
+  // is a function that applies in that formal argument position.
+  item = findTypeEntries(type, previous, m_data->m_key);
 
-    for ( ; item && item->m_key == m_data->m_key; item = item->m_next)
-    {
-	// The type is known to be related to this argument position
-	LOG (0, trace, LFmultimethod, ":" << item->m_formal);
+  for (; item && item->m_key == m_data->m_key; item = item->m_next) {
+    // The type is known to be related to this argument position
+    LOG(0, trace, LFmultimethod, ":" << item->m_formal);
 
-	// Skip this type if we have already processed it
-	if (item->m_generation == m_data->m_generation)
-	    continue;
+    // Skip this type if we have already processed it
+    if (item->m_generation == m_data->m_generation)
+      continue;
 
-	// Remember the current generation and zap the scores.  The
-	// m_scores may be non-null in the case this class was already
-	// used in dispatch, but is now dirty through a later load of
-	// a derived class used in actual arguments.
-	item->m_generation = m_data->m_generation;
-	item->m_scores = 0;
+    // Remember the current generation and zap the scores.  The
+    // m_scores may be non-null in the case this class was already
+    // used in dispatch, but is now dirty through a later load of
+    // a derived class used in actual arguments.
+    item->m_generation = m_data->m_generation;
+    item->m_scores = 0;
 
-	std::size_t			  formal = item->m_formal;
-	std::size_t			  related = 0;
-	bool				  specific = false;
-	PODVector<Member>::const_iterator memfun
-	    = PODVector<Member>::begin (m_data->m_family);
-	PODVector<Member>::const_iterator last
-	    = PODVector<Member>::end (m_data->m_family);
+    std::size_t formal = item->m_formal;
+    std::size_t related = 0;
+    bool specific = false;
+    PODVector<Member>::const_iterator memfun =
+        PODVector<Member>::begin(m_data->m_family);
+    PODVector<Member>::const_iterator last =
+        PODVector<Member>::end(m_data->m_family);
 
-	for ( ; memfun != last; ++memfun)
-	{
-	    // The member formal types must be complete by now and
-	    // they must be known to inherit (or be) the formal
-	    // arguments in the argument position.
+    for (; memfun != last; ++memfun) {
+      // The member formal types must be complete by now and
+      // they must be known to inherit (or be) the formal
+      // arguments in the argument position.
 
-	    // FIXME: Does this work in the presence of several XTypeInfos
-	    //        registered for the same type?  We must be sure to always
-	    //        deal with the single instance, or accept them all; in
-	    //        particular, if a shared library A is loaded, then B, then
-	    //        A unloaded, we must be able to still do the right thing...
-	    ASSERT (memfun->m_formalTypes [formal]->m_types);
-	    ASSERT (memfun->m_formalTypes [formal]->m_types
-		    == m_data->m_formalTypes [formal]->m_types
-		    || memfun->m_formalTypes [formal]->m_types->hasBase
-		       (m_data->m_formalTypes [formal]->m_types));
+      // FIXME: Does this work in the presence of several XTypeInfos
+      //        registered for the same type?  We must be sure to always
+      //        deal with the single instance, or accept them all; in
+      //        particular, if a shared library A is loaded, then B, then
+      //        A unloaded, we must be able to still do the right thing...
+      ASSERT(memfun->m_formalTypes[formal]->m_types);
+      ASSERT(memfun->m_formalTypes[formal]->m_types ==
+                 m_data->m_formalTypes[formal]->m_types ||
+             memfun->m_formalTypes[formal]->m_types->hasBase(
+                 m_data->m_formalTypes[formal]->m_types));
 
-	    specific = (specific || type == memfun->m_formalTypes [formal]->m_types);
-	    related += (type == memfun->m_formalTypes [formal]->m_types
-			|| type->hasBase (memfun->m_formalTypes [formal]->m_types));
-	}
-
-	// if none are related, do not build scores at all.
-	LOG (0, trace, LFmultimethod, "/" << related);
-	if (! related)
-	    continue;
-
-	using std::rel_ops::operator!=;
-
-	// see if we can optimise the score table away
-	if (! specific)
-	{
-	    std::size_t		relatedBases = 0;
-	    XTypeInfo::BaseIterator	base = type->beginBases ();
-	    XTypeInfo::BaseIterator	end = type->endBases ();
-	    Entry			*saved = 0;
-	    Entry			*baseinfo = 0;
-
-	    for ( ; base != end && relatedBases <= 1; ++base)
-		if ((baseinfo = findTypeEntries (base->base (), previous,
-						 m_data->m_key, formal)))
-		{
-		    saved = baseinfo;
-		    ++relatedBases;
-		}
-
-	    if (base == end && relatedBases == 1)
-	    {
-		// optimise scores away: use base class information
-		LOG (0, trace, LFmultimethod, "o");
-		item->m_scores = (saved ? saved->m_scores : 0);
-		continue;
-	    }
-	}
-
-	// build the scores
-	XTypeInfo::BaseIterator base;
-
-	item->m_scores = allocateScores (related+1);
-	memfun = PODVector<Member>::begin (m_data->m_family);
-	for (std::size_t score = 0, index = 0; memfun != last; ++memfun, ++index)
-	{
-	    // the actual argument types must be complete by now
-	    // FIXME: Does this work in the presence of several XTypeInfos
-	    //        registered for the same type?  We must be sure to always
-	    //        deal with the single instance, or accept them all; in
-	    //        particular, if a shared library A is loaded, then B, then
-	    //        A unloaded, we must be able to still do the right thing...
-	    ASSERT (memfun->m_formalTypes [formal]->m_types);
-	    if (type == memfun->m_formalTypes [formal]->m_types)
-	    {
-		LOG (0, trace, LFmultimethod, "(" << type->standard ().name () << "@" << 0 << ")");
-		ASSERT (score < related);
-		ASSERT (index < LAST_SCORE);
-		item->m_scores [score].m_index = index;
-		item->m_scores [score].m_distance = 0;
-		++score;
-	    }
-	    else if ((base = type->base (memfun->m_formalTypes [formal]->m_types))
-		     != type->endBases ())
-	    {
-		LOG (0, trace, LFmultimethod, "(" << base->base ()->standard ().name ()
-		     << "@" << base->distance () << ")");
-		ASSERT (score < related);
-		ASSERT (index < LAST_SCORE);
-		item->m_scores [score].m_index = index;
-		item->m_scores [score].m_distance = base->distance ();
-		++score;
-	    }
-	}
-
-	// ... add the sentinel
-	item->m_scores [related].m_index = LAST_SCORE;
-	item->m_scores [related].m_distance = INFINITE_DISTANCE;
-
-	// ... and sort them
-	std::sort (item->m_scores, item->m_scores+related, orderScores);
-
-	// ... and we are done!
-	LOG (0, trace, LFmultimethod, "c");
+      specific = (specific || type == memfun->m_formalTypes[formal]->m_types);
+      related += (type == memfun->m_formalTypes[formal]->m_types ||
+                  type->hasBase(memfun->m_formalTypes[formal]->m_types));
     }
+
+    // if none are related, do not build scores at all.
+    LOG(0, trace, LFmultimethod, "/" << related);
+    if (!related)
+      continue;
+
+    using std::rel_ops::operator!=;
+
+    // see if we can optimise the score table away
+    if (!specific) {
+      std::size_t relatedBases = 0;
+      XTypeInfo::BaseIterator base = type->beginBases();
+      XTypeInfo::BaseIterator end = type->endBases();
+      Entry *saved = 0;
+      Entry *baseinfo = 0;
+
+      for (; base != end && relatedBases <= 1; ++base)
+        if ((baseinfo = findTypeEntries(base->base(), previous, m_data->m_key,
+                                        formal))) {
+          saved = baseinfo;
+          ++relatedBases;
+        }
+
+      if (base == end && relatedBases == 1) {
+        // optimise scores away: use base class information
+        LOG(0, trace, LFmultimethod, "o");
+        item->m_scores = (saved ? saved->m_scores : 0);
+        continue;
+      }
+    }
+
+    // build the scores
+    XTypeInfo::BaseIterator base;
+
+    item->m_scores = allocateScores(related + 1);
+    memfun = PODVector<Member>::begin(m_data->m_family);
+    for (std::size_t score = 0, index = 0; memfun != last; ++memfun, ++index) {
+      // the actual argument types must be complete by now
+      // FIXME: Does this work in the presence of several XTypeInfos
+      //        registered for the same type?  We must be sure to always
+      //        deal with the single instance, or accept them all; in
+      //        particular, if a shared library A is loaded, then B, then
+      //        A unloaded, we must be able to still do the right thing...
+      ASSERT(memfun->m_formalTypes[formal]->m_types);
+      if (type == memfun->m_formalTypes[formal]->m_types) {
+        LOG(0, trace, LFmultimethod,
+            "(" << type->standard().name() << "@" << 0 << ")");
+        ASSERT(score < related);
+        ASSERT(index < LAST_SCORE);
+        item->m_scores[score].m_index = index;
+        item->m_scores[score].m_distance = 0;
+        ++score;
+      } else if ((base = type->base(memfun->m_formalTypes[formal]->m_types)) !=
+                 type->endBases()) {
+        LOG(0, trace, LFmultimethod,
+            "(" << base->base()->standard().name() << "@" << base->distance()
+                << ")");
+        ASSERT(score < related);
+        ASSERT(index < LAST_SCORE);
+        item->m_scores[score].m_index = index;
+        item->m_scores[score].m_distance = base->distance();
+        ++score;
+      }
+    }
+
+    // ... add the sentinel
+    item->m_scores[related].m_index = LAST_SCORE;
+    item->m_scores[related].m_distance = INFINITE_DISTANCE;
+
+    // ... and sort them
+    std::sort(item->m_scores, item->m_scores + related, orderScores);
+
+    // ... and we are done!
+    LOG(0, trace, LFmultimethod, "c");
+  }
 }
 
 /** The method is has new member functions: step the generation index
@@ -878,37 +797,32 @@ MultiMethod::buildScores (const XTypeInfo *type) const
     If the generation index wraps around to zero, we invalidate all
     #Entry records to avoid false generation matches (see
     #cleanScores()).  */
-void
-MultiMethod::newGeneration (void) const
-{
-    // FIXME: exception safety: block now so that multiple threads
-    //        dispatching at the same time won't mess each other up.
+void MultiMethod::newGeneration(void) const {
+  // FIXME: exception safety: block now so that multiple threads
+  //        dispatching at the same time won't mess each other up.
 
-    if (! m_data->m_hooked)
-    {
-	m_data->m_hooked = true;
-	XTypeInfo::addMonitor (const_cast<MultiMethod *> (this), true);
+  if (!m_data->m_hooked) {
+    m_data->m_hooked = true;
+    XTypeInfo::addMonitor(const_cast<MultiMethod *>(this), true);
+  }
+
+  // free all scores and get ready to allocate some more
+  freeScoreHunks();
+  m_data->m_generation++;
+  m_data->m_dirty = false;
+
+  if (!m_data->m_generation) {
+    // zap all scores -- we wrapped around
+    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal) {
+      // the XTypeInfo must be complete by now
+      ASSERT(m_data->m_formalTypes[formal]->m_types);
+      cleanScores(m_data->m_formalTypes[formal]->m_types);
     }
 
-    // free all scores and get ready to allocate some more
-    freeScoreHunks ();
+    // step one more to avoid zero generation index, that's what all
+    // the entries now have, and all uninitalised entries always have
     m_data->m_generation++;
-    m_data->m_dirty = false;
-
-    if (! m_data->m_generation)
-    {
-	// zap all scores -- we wrapped around
-	for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	{
-	    // the XTypeInfo must be complete by now
-	    ASSERT (m_data->m_formalTypes [formal]->m_types);
-	    cleanScores (m_data->m_formalTypes [formal]->m_types);
-        }
-
-	// step one more to avoid zero generation index, that's what all
-	// the entries now have, and all uninitalised entries always have
-	m_data->m_generation++;
-    }
+  }
 }
 
 /** @a type is about to be used in dispatch and doesn't have valid
@@ -916,31 +830,30 @@ MultiMethod::newGeneration (void) const
 
     As a little extra work we also update the scores for all the base
     types too, as that's how #buildScores() expects the world to be.  */
-inline void
-MultiMethod::regenerate (const XTypeInfo *type) const
-{
-    LOG (0, trace, LFmultimethod, "regenerating scores for "
-	 << type->standard ().name () << " (" << m_data->m_name << "):");
+inline void MultiMethod::regenerate(const XTypeInfo *type) const {
+  LOG(0, trace, LFmultimethod,
+      "regenerating scores for " << type->standard().name() << " ("
+                                 << m_data->m_name << "):");
 
-    // FIXME: exception safety: block now so that multiple threads
-    //        dispatching at the same time won't mess each other up.
+  // FIXME: exception safety: block now so that multiple threads
+  //        dispatching at the same time won't mess each other up.
 
-    // Rebuild scores for this type, in reverse class inheritance order.
-    // XTypeInfo already knows all the classes we need to know about,
-    // and we just walk the base list in reverse order.  #buildScores()
-    // automatically ignores unrelated types, so we won't waste time
-    // checking for that here.
+  // Rebuild scores for this type, in reverse class inheritance order.
+  // XTypeInfo already knows all the classes we need to know about,
+  // and we just walk the base list in reverse order.  #buildScores()
+  // automatically ignores unrelated types, so we won't waste time
+  // checking for that here.
 
-    using std::rel_ops::operator!=;
+  using std::rel_ops::operator!=;
 
-    ASSERT (type);
-    XTypeInfo::BaseIterator	first = type->beginBases ();
-    XTypeInfo::BaseIterator	last = type->endBases ();
-    while (last != first)
-	buildScores ((--last)->base ());
+  ASSERT(type);
+  XTypeInfo::BaseIterator first = type->beginBases();
+  XTypeInfo::BaseIterator last = type->endBases();
+  while (last != first)
+    buildScores((--last)->base());
 
-    buildScores (type);
-    LOG (0, trace, LFmultimethod, '\n');
+  buildScores(type);
+  LOG(0, trace, LFmultimethod, '\n');
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -981,143 +894,135 @@ MultiMethod::regenerate (const XTypeInfo *type) const
     are not quite constant time look-ups, but very fast at any rate.
     The more specific member functions we have, the faster the lookup
     converges and the less the ambiguity check has work to do.  */
-MultiMethod::MemberFunction
-MultiMethod::dispatch (XTypeInfo **actualTypes,
-		       Score **candidates,
-		       Score *best) const
-{
-    ASSERT (m_data);
-    ASSERT (m_data->m_key);
+MultiMethod::MemberFunction MultiMethod::dispatch(XTypeInfo **actualTypes,
+                                                  Score **candidates,
+                                                  Score *best) const {
+  ASSERT(m_data);
+  ASSERT(m_data->m_key);
 
-    if (m_data->m_dirty)
-	newGeneration ();
+  if (m_data->m_dirty)
+    newGeneration();
 
-    // Locate scoring information for the actual argument types.
-    Entry *previous = 0;
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-    {
-	Entry *data = findTypeEntries (actualTypes [formal], previous,
-				       m_data->m_key, formal);
+  // Locate scoring information for the actual argument types.
+  Entry *previous = 0;
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal) {
+    Entry *data =
+        findTypeEntries(actualTypes[formal], previous, m_data->m_key, formal);
 
-	if (data && data->m_generation < m_data->m_generation)
-	    regenerate (actualTypes [formal]);
+    if (data && data->m_generation < m_data->m_generation)
+      regenerate(actualTypes[formal]);
 
-	if (! data || ! data->m_scores)
-	    noViableAlt (actualTypes);
+    if (!data || !data->m_scores)
+      noViableAlt(actualTypes);
 
-	ASSERT (data->m_generation == m_data->m_generation);
-	candidates [formal] = data->m_scores;
-    }
+    ASSERT(data->m_generation == m_data->m_generation);
+    candidates[formal] = data->m_scores;
+  }
 
 #ifndef NLOG
-    LOG (1, trace, LFmultimethod, m_data->m_name
-	 << " dispatch candidates are:\n" << indent);
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-    {
-	LOG (1, trace, LFmultimethod, "[" << formal << "]: ");
-	for (Score *s = candidates [formal]; s->m_index != LAST_SCORE; ++s)
-	    LOG (1, trace, LFmultimethod, " <" << s->m_index << ","
-		 << s->m_distance << ">");
-	LOG (1, trace, LFmultimethod, "\n");
-    }
-    LOG (1, trace, LFmultimethod, undent);
+  LOG(1, trace, LFmultimethod,
+      m_data->m_name << " dispatch candidates are:\n"
+                     << indent);
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal) {
+    LOG(1, trace, LFmultimethod, "[" << formal << "]: ");
+    for (Score *s = candidates[formal]; s->m_index != LAST_SCORE; ++s)
+      LOG(1, trace, LFmultimethod,
+          " <" << s->m_index << "," << s->m_distance << ">");
+    LOG(1, trace, LFmultimethod, "\n");
+  }
+  LOG(1, trace, LFmultimethod, undent);
 #endif
 
-    // Select a match; we only end up here if we do have something to
-    // process.  There is no danger that the lists are empty with only
-    // sentinels in them -- they will contain at least one with index
-    // different from LAST_SCORE.
-    bool found = true;
-    best [0] = *candidates [0];
-    do
-    {
-	found = true;
-	for (std::size_t formal = 1; found && formal < m_data->m_formals; ++formal)
-	{
-	    std::size_t cand = 0;
-	    do
-		found = (best [0].m_index == candidates [formal][cand].m_index);
-	    while (! found && candidates [formal][++cand].m_index != LAST_SCORE);
+  // Select a match; we only end up here if we do have something to
+  // process.  There is no danger that the lists are empty with only
+  // sentinels in them -- they will contain at least one with index
+  // different from LAST_SCORE.
+  bool found = true;
+  best[0] = *candidates[0];
+  do {
+    found = true;
+    for (std::size_t formal = 1; found && formal < m_data->m_formals;
+         ++formal) {
+      std::size_t cand = 0;
+      do
+        found = (best[0].m_index == candidates[formal][cand].m_index);
+      while (!found && candidates[formal][++cand].m_index != LAST_SCORE);
 
-	    if (found)
-		best [formal] = candidates [formal][cand];
-	}
-    } while (! found && (best [0] = *++(candidates[0])).m_index != LAST_SCORE);
+      if (found)
+        best[formal] = candidates[formal][cand];
+    }
+  } while (!found && (best[0] = *++(candidates[0])).m_index != LAST_SCORE);
 
-    if (! found)
-	noViableAlt (actualTypes);
+  if (!found)
+    noViableAlt(actualTypes);
 
-    // We have a candidate in best now; make sure it is the only one.
-    // If not, we have an ambiguity.  The situation can only arise for
-    // the remaining members in candidates[0] with the same distance,
-    // so we'll keep moving that one and looking up in the other
-    // argument positions' lists to see if it the ambiguity candidate
-    // has the same or better distance in all of them.  Note that we
-    // can find a better candidate among those that we inspect if the
-    // distance in the first argument is no worse and better in some
-    // of the others.  In that case we change our best candidate.
-    bool ambiguous = false;
-    while (! ambiguous && (++candidates[0])->m_distance == best [0].m_distance)
-    {
-	bool betterInAll = true;
-	bool better = false;
+  // We have a candidate in best now; make sure it is the only one.
+  // If not, we have an ambiguity.  The situation can only arise for
+  // the remaining members in candidates[0] with the same distance,
+  // so we'll keep moving that one and looking up in the other
+  // argument positions' lists to see if it the ambiguity candidate
+  // has the same or better distance in all of them.  Note that we
+  // can find a better candidate among those that we inspect if the
+  // distance in the first argument is no worse and better in some
+  // of the others.  In that case we change our best candidate.
+  bool ambiguous = false;
+  while (!ambiguous && (++candidates[0])->m_distance == best[0].m_distance) {
+    bool betterInAll = true;
+    bool better = false;
 
-	found = true;
-	for (std::size_t formal = 1; found && formal < m_data->m_formals; ++formal)
-	{
-	    std::size_t cand = 0;
-	    do
-		found = candidates[0][0].m_index == candidates[formal][cand].m_index;
-	    while (! found
-		   && candidates [formal][++cand].m_index != LAST_SCORE
-		   && candidates [formal][cand].m_distance <= best [formal].m_distance);
+    found = true;
+    for (std::size_t formal = 1; found && formal < m_data->m_formals;
+         ++formal) {
+      std::size_t cand = 0;
+      do
+        found = candidates[0][0].m_index == candidates[formal][cand].m_index;
+      while (!found && candidates[formal][++cand].m_index != LAST_SCORE &&
+             candidates[formal][cand].m_distance <= best[formal].m_distance);
 
-	    if (found && candidates[formal][cand].m_distance < best[formal].m_distance)
-		better = true;
-	    else
-		betterInAll = false;
-	}
+      if (found &&
+          candidates[formal][cand].m_distance < best[formal].m_distance)
+        better = true;
+      else
+        betterInAll = false;
+    }
 
-	if (betterInAll && better)
-	{
-	    best[0] = *candidates[0];
+    if (betterInAll && better) {
+      best[0] = *candidates[0];
 #if !defined NDEBUG && !defined NLOG
-	    // update the information so we will report the distances right
-	    for (std::size_t formal = 1; formal < m_data->m_formals; ++formal)
-	    {
-		std::size_t cand = 0;
-		while (candidates [0][0].m_index != candidates [formal][cand].m_index)
-		    ++cand;
-		best [formal] = candidates [formal][cand];
-	    }
+      // update the information so we will report the distances right
+      for (std::size_t formal = 1; formal < m_data->m_formals; ++formal) {
+        std::size_t cand = 0;
+        while (candidates[0][0].m_index != candidates[formal][cand].m_index)
+          ++cand;
+        best[formal] = candidates[formal][cand];
+      }
 #endif
-	}
-	else if (better)
-	    ambiguous = true;
-    }
+    } else if (better)
+      ambiguous = true;
+  }
 
-    if (ambiguous)
-	ambiguity (actualTypes, candidates, best);
+  if (ambiguous)
+    ambiguity(actualTypes, candidates, best);
 
-    ASSERT (best [0].m_index < PODVector<Member>::size (m_data->m_family));
+  ASSERT(best[0].m_index < PODVector<Member>::size(m_data->m_family));
 #if !NDEBUG
-    LOG (1, trace, LFmultimethod, m_data->m_name << " (#"
-	 << m_data->m_key << ") (");
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	LOG (1, trace, LFmultimethod,
-	     "virtual "
-	     << m_data->m_formalTypes [formal]->m_types->standard ().name ()
-	     << (formal == m_data->m_formals-1 ? " *)\n" : " *, "));
-    LOG (1, trace, LFmultimethod, "  --> #" << best [0].m_index << " (");
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	LOG (1, trace, LFmultimethod,
-	     "virtual "
-	     << (m_data->m_family.begin[best[0].m_index].m_formalTypes[formal]
-		 ->m_types->standard ().name ())
-	     << " * [d=" << best [formal].m_distance
-	     << (formal == m_data->m_formals-1 ? "])\n" : "], "));
+  LOG(1, trace, LFmultimethod,
+      m_data->m_name << " (#" << m_data->m_key << ") (");
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
+    LOG(1, trace, LFmultimethod,
+        "virtual " << m_data->m_formalTypes[formal]->m_types->standard().name()
+                   << (formal == m_data->m_formals - 1 ? " *)\n" : " *, "));
+  LOG(1, trace, LFmultimethod, "  --> #" << best[0].m_index << " (");
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
+    LOG(1, trace, LFmultimethod,
+        "virtual " << (m_data->m_family.begin[best[0].m_index]
+                           .m_formalTypes[formal]
+                           ->m_types->standard()
+                           .name())
+                   << " * [d=" << best[formal].m_distance
+                   << (formal == m_data->m_formals - 1 ? "])\n" : "], "));
 #endif // !NDEBUG
-    return m_data->m_family.begin [best [0].m_index].m_function;
+  return m_data->m_family.begin[best[0].m_index].m_function;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1132,42 +1037,37 @@ MultiMethod::dispatch (XTypeInfo **actualTypes,
     recover by loading some extra shared libraries on the exception,
     but for now we make this a hard error just like a compiler would
     do on static overload resolution.  */
-void
-MultiMethod::noViableAlt (XTypeInfo **actualTypes) const
-{
+void MultiMethod::noViableAlt(XTypeInfo **actualTypes) const {
+  UNUSED(actualTypes);
 #ifndef NDEBUG
-    LOG (0, error, LFmultimethod, m_data->m_name << " (#"
-	 << m_data->m_key << ") (");
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	LOG (0, error, LFmultimethod,
-	     "virtual "
-	     << m_data->m_formalTypes [formal]->m_types->standard ().name ()
-	     << (formal == m_data->m_formals-1 ? " *)\n" : " *, "));
+  LOG(0, error, LFmultimethod,
+      m_data->m_name << " (#" << m_data->m_key << ") (");
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
+    LOG(0, error, LFmultimethod,
+        "virtual " << m_data->m_formalTypes[formal]->m_types->standard().name()
+                   << (formal == m_data->m_formals - 1 ? " *)\n" : " *, "));
 
-    LOG (0, error, LFmultimethod,
-	 "  no viable alternative for arguments (");
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	LOG (0, error, LFmultimethod,
-	     "virtual "
-	     << actualTypes [formal]->standard ().name ()
-	     << (formal == m_data->m_formals-1 ? " *)\n" : " *, "));
+  LOG(0, error, LFmultimethod, "  no viable alternative for arguments (");
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
+    LOG(0, error, LFmultimethod,
+        "virtual " << actualTypes[formal]->standard().name()
+                   << (formal == m_data->m_formals - 1 ? " *)\n" : " *, "));
 
-    LOG (0, error, LFmultimethod, "  candidates are:\n");
-    PODVector<Member>::const_iterator memfun
-	= PODVector<Member>::begin (m_data->m_family);
-    PODVector<Member>::const_iterator last
-	= PODVector<Member>::end (m_data->m_family);
-    for (std::size_t n = 0; memfun != last; ++memfun, ++n)
-    {
-	LOG (0, error, LFmultimethod, "  [#" << n << "] (");
-	for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	    LOG (0, error, LFmultimethod,
-		 "virtual "
-		 << memfun->m_formalTypes [formal]->m_types->standard ().name ()
-		 << (formal == m_data->m_formals-1 ? " *)\n" : " *, "));
-    }
+  LOG(0, error, LFmultimethod, "  candidates are:\n");
+  PODVector<Member>::const_iterator memfun =
+      PODVector<Member>::begin(m_data->m_family);
+  PODVector<Member>::const_iterator last =
+      PODVector<Member>::end(m_data->m_family);
+  for (std::size_t n = 0; memfun != last; ++memfun, ++n) {
+    LOG(0, error, LFmultimethod, "  [#" << n << "] (");
+    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
+      LOG(0, error, LFmultimethod,
+          "virtual "
+              << memfun->m_formalTypes[formal]->m_types->standard().name()
+              << (formal == m_data->m_formals - 1 ? " *)\n" : " *, "));
+  }
 #endif // !NDEBUG
-    abort ();
+  abort();
 }
 
 /** Dead-end: declare that there are several possible matches.
@@ -1182,76 +1082,68 @@ MultiMethod::noViableAlt (XTypeInfo **actualTypes) const
     something more specific from a shared library.  For now we just
     make this a hard error just like the compiler would do on static
     overload resolution.  */
-void
-MultiMethod::ambiguity (XTypeInfo **actualTypes,
-			Score **candidates,
-			Score *best) const
-{
+void MultiMethod::ambiguity(XTypeInfo **actualTypes, Score **candidates,
+                            Score *best) const {
+  UNUSED(actualTypes);
+  UNUSED(candidates);
+  UNUSED(best);
 #ifndef NDEBUG
-    LOG (0, error, LFmultimethod, m_data->m_name << " (#"
-	 << m_data->m_key << ") (");
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	LOG (0, error, LFmultimethod,
-	     "virtual "
-	     << m_data->m_formalTypes [formal]->m_types->standard ().name ()
-	     << (formal == m_data->m_formals-1 ? " *)\n" : " *, "));
-    LOG (0, error, LFmultimethod,
-	 "  ambiguous call (");
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	LOG (0, error, LFmultimethod,
-	     "virtual "
-	     << actualTypes [formal]->standard ().name ()
-	     << (formal == m_data->m_formals-1 ? " *)\n" : " *, "));
-    LOG (0, error, LFmultimethod, "  candidates are:\n    (");
-    ASSERT (best [0].m_index < PODVector<Member>::size (m_data->m_family));
-    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-    {
-	const XTypeInfo *type
-	    = m_data->m_family.begin [best [0].m_index].m_formalTypes[formal]->m_types;
-	LOG (0, error, LFmultimethod,
-	     "virtual "
-	     << type->standard ().name ()
-	     << " [d=" << best [formal].m_distance << "] "
-	     << (formal == m_data->m_formals-1 ? " *)\n" : " *, "));
+  LOG(0, error, LFmultimethod,
+      m_data->m_name << " (#" << m_data->m_key << ") (");
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
+    LOG(0, error, LFmultimethod,
+        "virtual " << m_data->m_formalTypes[formal]->m_types->standard().name()
+                   << (formal == m_data->m_formals - 1 ? " *)\n" : " *, "));
+  LOG(0, error, LFmultimethod, "  ambiguous call (");
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
+    LOG(0, error, LFmultimethod,
+        "virtual " << actualTypes[formal]->standard().name()
+                   << (formal == m_data->m_formals - 1 ? " *)\n" : " *, "));
+  LOG(0, error, LFmultimethod, "  candidates are:\n    (");
+  ASSERT(best[0].m_index < PODVector<Member>::size(m_data->m_family));
+  for (std::size_t formal = 0; formal < m_data->m_formals; ++formal) {
+    const XTypeInfo *type =
+        m_data->m_family.begin[best[0].m_index].m_formalTypes[formal]->m_types;
+    LOG(0, error, LFmultimethod,
+        "virtual " << type->standard().name()
+                   << " [d=" << best[formal].m_distance << "] "
+                   << (formal == m_data->m_formals - 1 ? " *)\n" : " *, "));
+  }
+  bool found;
+  do {
+    // Dump out an ambiguous candidate; The first time around this loop
+    // the ambiguity is the one `candidates[0]' points to.  We look for other
+    // ambiguities below in the second loop.
+    best[0] = *candidates[0];
+    ASSERT(best[0].m_index < PODVector<Member>::size(m_data->m_family));
+    for (std::size_t formal = 0; formal < m_data->m_formals; ++formal) {
+      const XTypeInfo *type = m_data->m_family.begin[best[0].m_index]
+                                  .m_formalTypes[formal]
+                                  ->m_types;
+      LOG(0, error, LFmultimethod,
+          (formal == 0 ? "    (" : "")
+              << "virtual " << type->standard().name()
+              << " [d=" << candidates[formal]->m_distance << "] "
+              << (formal == m_data->m_formals - 1 ? " *)\n" : " *, "));
     }
-    bool found;
-    do {
-	// Dump out an ambiguous candidate; The first time around this loop
-	// the ambiguity is the one `candidates[0]' points to.  We look for other
-	// ambiguities below in the second loop.
-	best [0] = *candidates [0];
-	ASSERT (best [0].m_index < PODVector<Member>::size (m_data->m_family));
-	for (std::size_t formal = 0; formal < m_data->m_formals; ++formal)
-	{
-	    const XTypeInfo *type
-		= m_data->m_family.begin[best[0].m_index].m_formalTypes[formal]->m_types;
-	    LOG (0, error, LFmultimethod,
-		 (formal == 0 ? "    (" : "")
-		 << "virtual "
-		 << type->standard ().name ()
-		 << " [d=" << candidates [formal]->m_distance << "] "
-		 << (formal == m_data->m_formals-1 ? " *)\n" : " *, "));
-	}
 
-	// Find the next ambiguity
-	found = false;
-	while (!found && (++candidates [0])->m_distance == best [0].m_distance)
-	{
-	    found = true;
-	    for (std::size_t formal = 1; found && formal < m_data->m_formals; ++formal)
-	    {
-		std::size_t cand = 0;
-		found = false;
-		do
-		    found = (candidates [0]->m_index == candidates [formal][cand].m_index);
-		while (! found
-		       && candidates [formal][++cand].m_index != LAST_SCORE
-		       && candidates [formal][cand].m_distance <= best [formal].m_distance);
-	    }
-	}
-    } while (found);
+    // Find the next ambiguity
+    found = false;
+    while (!found && (++candidates[0])->m_distance == best[0].m_distance) {
+      found = true;
+      for (std::size_t formal = 1; found && formal < m_data->m_formals;
+           ++formal) {
+        std::size_t cand = 0;
+        found = false;
+        do
+          found = (candidates[0]->m_index == candidates[formal][cand].m_index);
+        while (!found && candidates[formal][++cand].m_index != LAST_SCORE &&
+               candidates[formal][cand].m_distance <= best[formal].m_distance);
+      }
+    }
+  } while (found);
 #endif // !NDEBUG
-    abort ();
+  abort();
 }
 
 } // namespace lat
