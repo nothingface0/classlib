@@ -116,6 +116,36 @@ libclasslib_la_SOURCES =			\
   src/iobase/TempFile.cpp			\
   src/iobase/UnixTempFile.cpp			\
   src/iobase/WindowsTempFile.cpp		\
+  src/iotools/BufferInputStream.cpp		\
+  src/iotools/BufferOutputStream.cpp		\
+  src/iotools/FilterInputStream.cpp		\
+  src/iotools/FilterOutputStream.cpp		\
+  src/iotools/IOChannelInputStream.cpp		\
+  src/iotools/IOChannelOutputStream.cpp		\
+  src/iotools/IOChannelStreamBuf.cpp		\
+  src/iotools/IOException.cpp			\
+  src/iotools/InputStream.cpp			\
+  src/iotools/InputStreamBuf.cpp		\
+  src/iotools/MemoryStorage.cpp			\
+  src/iotools/OutputStream.cpp			\
+  src/iotools/OutputStreamBuf.cpp		\
+  src/iotools/PipedInputStream.cpp		\
+  src/iotools/PipedOutputStream.cpp		\
+  src/iotools/PushBackBuffer.cpp		\
+  src/iotools/PushBackInputStream.cpp		\
+  src/iotools/ReadBuffer.cpp			\
+  src/iotools/ReadWriteBuffer.cpp		\
+  src/iotools/StdError.cpp			\
+  src/iotools/StdInputStream.cpp		\
+  src/iotools/StdOutputStream.cpp		\
+  src/iotools/StdStorage.cpp			\
+  src/iotools/StdioError.cpp			\
+  src/iotools/StdioStorage.cpp			\
+  src/iotools/StorageInputStream.cpp		\
+  src/iotools/StorageOutputStream.cpp		\
+  src/iotools/StorageStreamBuf.cpp		\
+  src/iotools/SubStorage.cpp			\
+  src/iotools/WriteBuffer.cpp			\
   src/zip/Adler32.cpp				\
   src/zip/BZCompressor.cpp			\
   src/zip/BZDecompressor.cpp			\
@@ -204,6 +234,37 @@ nobase_include_HEADERS =			\
   classlib/iobase/SubProcess.h			\
   classlib/iobase/SubProcessError.h		\
   classlib/iobase/TempFile.h			\
+  classlib/iotools/BufferInputStream.h		\
+  classlib/iotools/BufferOutputStream.h		\
+  classlib/iotools/CustomStreamBuf.h		\
+  classlib/iotools/FilterInputStream.h		\
+  classlib/iotools/FilterOutputStream.h		\
+  classlib/iotools/IOChannelInputStream.h	\
+  classlib/iotools/IOChannelOutputStream.h	\
+  classlib/iotools/IOChannelStreamBuf.h		\
+  classlib/iotools/IOException.h		\
+  classlib/iotools/InputStream.h		\
+  classlib/iotools/InputStreamBuf.h		\
+  classlib/iotools/MemoryStorage.h		\
+  classlib/iotools/OutputStream.h		\
+  classlib/iotools/OutputStreamBuf.h		\
+  classlib/iotools/PipedInputStream.h		\
+  classlib/iotools/PipedOutputStream.h		\
+  classlib/iotools/PushBackBuffer.h		\
+  classlib/iotools/PushBackInputStream.h	\
+  classlib/iotools/ReadBuffer.h			\
+  classlib/iotools/ReadWriteBuffer.h		\
+  classlib/iotools/StdError.h			\
+  classlib/iotools/StdInputStream.h		\
+  classlib/iotools/StdOutputStream.h		\
+  classlib/iotools/StdStorage.h			\
+  classlib/iotools/StdioError.h			\
+  classlib/iotools/StdioStorage.h		\
+  classlib/iotools/StorageInputStream.h		\
+  classlib/iotools/StorageOutputStream.h	\
+  classlib/iotools/StorageStreamBuf.h		\
+  classlib/iotools/SubStorage.h			\
+  classlib/iotools/WriteBuffer.h		\
   classlib/sysapi/DebugAids.h			\
   classlib/sysapi/Detect.h                      \
   classlib/sysapi/DirIterator.h			\
@@ -421,6 +482,28 @@ classlib_test_SOURCES =				\
   test/iobase/SubStorage03.cpp			\
   test/iobase/SubStorage04.cpp			\
   test/iobase/SubStorage05.cpp			\
+  test/iotools/BufferInputStream01.cpp		\
+  test/iotools/BufferOutputStream01.cpp		\
+  test/iotools/FilterInputStream01.cpp		\
+  test/iotools/FilterOutputStream01.cpp		\
+  test/iotools/IOChannelInputStream01.cpp	\
+  test/iotools/IOChannelOutputStream01.cpp	\
+  test/iotools/PipedInputStream01.cpp		\
+  test/iotools/PipedOutputStream01.cpp		\
+  test/iotools/PushBackInputStream01.cpp	\
+  test/iotools/StdInputStream01.cpp		\
+  test/iotools/StdInputStream02.cpp		\
+  test/iotools/StdOutputStream01.cpp		\
+  test/iotools/StdStorage01.cpp			\
+  test/iotools/StdStorage02.cpp			\
+  test/iotools/StdStorage03.cpp			\
+  test/iotools/StdStorage04.cpp			\
+  test/iotools/StdioStorage01.cpp		\
+  test/iotools/StdioStorage02.cpp		\
+  test/iotools/StdioStorage03.cpp		\
+  test/iotools/StdioStorage04.cpp		\
+  test/iotools/StorageInputStream01.cpp		\
+  test/iotools/StorageOutputStream01.cpp	\
   test/utils/Argz01.cpp				\
   test/utils/AutoLoad01.cpp			\
   test/utils/BitIterator01.cpp			\
@@ -480,7 +563,53 @@ classlib_test_SOURCES =				\
   test/utils/exa_Log.cpp			\
   test/utils/exa_ResourceInfo.cpp		\
   test/utils/exa_Signal.cpp			\
-  test/utils/LogListener.cpp			
+  test/utils/LogListener.cpp			\
+  test/zip/Adler3201.cpp			\
+  test/zip/BZCompressor01.cpp			\
+  test/zip/BZDecompressor01.cpp			\
+  test/zip/BZIPInputStream01.cpp		\
+  test/zip/BZIPOutputStream01.cpp		\
+  test/zip/CPIOInputStream01.cpp		\
+  test/zip/CPIOInputStream02.cpp		\
+  test/zip/CPIOOutputStream00.cpp		\
+  test/zip/CPIOOutputStream01.cpp		\
+  test/zip/CPIOOutputStream02.cpp		\
+  test/zip/CPIOOutputStream03.cpp		\
+  test/zip/CRC3201.cpp				\
+  test/zip/CheckedInputStream01.cpp		\
+  test/zip/CheckedOutputStream01.cpp		\
+  test/zip/GZIPInputStream01.cpp		\
+  test/zip/GZIPInputStream02.cpp		\
+  test/zip/GZIPOutputStream01.cpp		\
+  test/zip/InteractiveCompressor01.cpp		\
+  test/zip/InteractiveDecompressor01.cpp	\
+  test/zip/LZMACompressor01.cpp			\
+  test/zip/LZOCompressor01.cpp			\
+  test/zip/MD5Digest01.cpp			\
+  test/zip/SHA1Digest01.cpp			\
+  test/zip/TarInputStream01.cpp			\
+  test/zip/TarInputStream02.cpp			\
+  test/zip/TarInputStream03.cpp			\
+  test/zip/TarOutputStream00.cpp		\
+  test/zip/TarOutputStream01.cpp		\
+  test/zip/ZCompressor01.cpp			\
+  test/zip/ZDecompressor01.cpp			\
+  test/zip/ZInputStream01.cpp			\
+  test/zip/ZOutputStream01.cpp			\
+  test/zip/ZipArchive01.cpp			\
+  test/zip/ZipArchive02.cpp			\
+  test/zip/ZipArchive03.cpp			\
+  test/zip/ZipArchive04.cpp			\
+  test/zip/ZipArchive05.cpp			\
+  test/zip/ZipArchive06.cpp			\
+  test/zip/ZipArchive07.cpp			\
+  test/zip/ZipArchive08.cpp			\
+  test/zip/ZipInputStream01.cpp			\
+  test/zip/ZipInputStream02.cpp			\
+  test/zip/ZipInputStream03.cpp			\
+  test/zip/ZipOutputStream00.cpp		\
+  test/zip/ZipOutputStream01.cpp		\
+  test/zip/ZipUtils01.cpp
 
 TestDriver.cpp: Makefile
 	@(echo '#include <ctype.h>';				\
