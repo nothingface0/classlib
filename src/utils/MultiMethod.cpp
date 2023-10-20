@@ -4,7 +4,7 @@
 #include "classlib/utils/Log.h"
 #include <algorithm>
 #include <utility>
-
+#define UNUSED(x) (void)(x)
 namespace lat {
 
 /** The multi-method logging flag. */
@@ -1135,6 +1135,7 @@ MultiMethod::dispatch (XTypeInfo **actualTypes,
 void
 MultiMethod::noViableAlt (XTypeInfo **actualTypes) const
 {
+  UNUSED(actualTypes);
 #ifndef NDEBUG
     LOG (0, error, LFmultimethod, m_data->m_name << " (#"
 	 << m_data->m_key << ") (");
@@ -1187,6 +1188,9 @@ MultiMethod::ambiguity (XTypeInfo **actualTypes,
 			Score **candidates,
 			Score *best) const
 {
+  UNUSED(actualTypes);
+  UNUSED(candidates);
+  UNUSED(best);
 #ifndef NDEBUG
     LOG (0, error, LFmultimethod, m_data->m_name << " (#"
 	 << m_data->m_key << ") (");

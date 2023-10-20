@@ -332,7 +332,7 @@ Time::nanoformat (int minwidth /* = 1 */, int maxwidth /* = 9 */) const
     ASSERT (maxwidth <= 9);
 
     // Calculate the nanosecond fraction.  This will be < 1000000000.
-    long value = m_nsecs % SEC_NSECS;
+    unsigned int value = m_nsecs % SEC_NSECS;
     ASSERT (value >= 0);
     ASSERT (value < SEC_NSECS);
 
@@ -354,7 +354,7 @@ Time::nanoformat (int minwidth /* = 1 */, int maxwidth /* = 9 */) const
     // minwidth.
     char buf [10];
     char *p = buf + 8;
-    sprintf (buf, "%09ld", value);
+    sprintf (buf, "%09d", value);
     while (p > buf + minwidth - 1 && *p == '0')
 	*p-- = '\0';
 

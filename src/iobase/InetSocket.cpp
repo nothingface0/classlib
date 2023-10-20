@@ -4,7 +4,7 @@
 #include "classlib/utils/DebugAids.h"
 #include "classlib/sysapi/InetSocket.h"
 #include <cstdio>
-
+#define UNUSED(x) (void)(x)
 namespace lat {
 
 
@@ -62,6 +62,7 @@ InetAddress::InetAddress (unsigned long address,
 			  unsigned short port /* = 0 */,
 			  int family /* = AF_INET */)
 {
+  UNUSED(family);
     ASSERT(family == AF_INET);
 
     char srvnr[32];
@@ -82,6 +83,7 @@ InetAddress::InetAddress (unsigned long address,
 			  const char *proto /* = "tcp" */,
 			  int family /* = AF_INET */)
 {
+  UNUSED(family);
     ASSERT(family == AF_INET);
     protoent *p = getprotobyname(proto);
     if (! p) throw NetworkError ("getprotobyname()", proto);

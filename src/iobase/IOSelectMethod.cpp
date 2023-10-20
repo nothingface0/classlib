@@ -29,6 +29,8 @@ IOSelectMethod::addReq (const IOSelectRequest &req)
 void
 IOSelectMethod::removeReq (const IOSelectRequest &req, size_t index)
 {
+#define UNUSED(x) (void)(x)
+    UNUSED(req);
     ASSERT (index < m_requests.size ());
     ASSERT (m_requests [index].fd == req.fd);
     ASSERT (m_requests [index].channel == req.channel);

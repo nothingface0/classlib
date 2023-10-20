@@ -4,7 +4,7 @@
 #include "classlib/utils/DebugAids.h"
 #include <cstring>
 #include <cctype>
-
+#define UNUSED(x) (void)(x)
 namespace lat {
 
 //////////////////////////////////////////////////////////////////////
@@ -119,6 +119,7 @@ StringOps::rawrfind (const char		*s,
 		     int		offset,
 		     bool		caseless /* = false */)
 {
+  UNUSED(slen);
     ASSERT (offset >= 0);
     ASSERT ((size_t) offset <= slen);
 
@@ -633,6 +634,7 @@ StringOps::split (const char *s, size_t slen,
 		  const FieldList &fields,
 		  int nmax, int first, int last)
 {
+  UNUSED(slen);
     ASSERT (fields.size () % 2 == 0);
     ASSERT (nmax >= 0);
 
@@ -693,6 +695,7 @@ StringOps::section (const char *s, size_t slen,
 		    const FieldList &fields,
 		    int first, int last)
 {
+  UNUSED(slen);
     if (fields.empty ())
 	return "";
 

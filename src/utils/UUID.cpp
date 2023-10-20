@@ -512,7 +512,7 @@ UUID::getNodeID(unsigned char *id)
 		    int s;
 		    struct ifreq ifr;
 		    memset(&ifr, 0, sizeof(ifr));
-		    strncpy(ifr.ifr_name, ifp->ifa_name, sizeof(ifr.ifr_name));
+		    memcpy(ifr.ifr_name, ifp->ifa_name, sizeof(ifr.ifr_name));
 		    if ((s = socket(ifp->ifa_addr->sa_family, SOCK_DGRAM, 0)) >= 0
 			&& ioctl(s, SIOCGIFHWADDR, &ifr) >= 0
 			&& (a = (unsigned char *) &ifr.ifr_hwaddr.sa_data)

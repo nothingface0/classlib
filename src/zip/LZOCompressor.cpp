@@ -290,7 +290,7 @@ LZOCompressor::compress (void *into, IOSize length)
         char lzo1x_999  [LZO1X_999_MEM_COMPRESS];
         char lzo1y_1    [LZO1Y_MEM_COMPRESS];
         char lzo1y_999  [LZO1Y_999_MEM_COMPRESS];
-        char lzo1z_1    [LZO1Z_MEM_COMPRESS];
+        char lzo1z_1    [LZO1_MEM_COMPRESS];
         char lzo1z_999  [LZO1Z_999_MEM_COMPRESS];
         char lzo2a_999  [LZO2A_999_MEM_COMPRESS];
     };

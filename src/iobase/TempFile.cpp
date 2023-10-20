@@ -81,7 +81,7 @@ domkstemp(char *path, ...)
 
 /** Create a unique temporary file.  */
 template <typename R, typename T, typename U>
-inline typename define_if<sizeof(((int (*) (char *, int)) &mkstemps) > 0), R>::type
+inline typename define_if<sizeof(((int (*) (char *, int)) &mkstemps) > NULL), R>::type
 domkstemps(T path, U suffixlen, void *)
 { return mkstemps(path, suffixlen); }
 
