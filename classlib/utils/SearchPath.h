@@ -22,6 +22,7 @@ public:
     typedef DirList::const_reverse_iterator	const_reverse_iterator;
 
     typedef DirList::size_type			size_type;
+		typedef DirList::value_type     value_type;
     typedef DirList::reference			reference;
     typedef DirList::const_reference		const_reference;
 
