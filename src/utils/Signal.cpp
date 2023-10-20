@@ -318,7 +318,7 @@ Signal::queue (pid_t process, int sig, int value /* = 0 */)
     process = 0; // silence unused warning
     sig = 0;     // silence unused warning
     value = 0;   // silence unused warning
-    return process + sig + (long long) value;
+    return 0;
 #endif
 }
 
@@ -335,7 +335,7 @@ Signal::queue (pid_t process, int sig, void *value)
     process = 0; // silence unused warning
     sig = 0;     // silence unused warning
     value = 0;   // silence unused warning
-    return process + sig + (long long) value;
+    return 0;
 #endif
 }
 
@@ -350,7 +350,7 @@ Signal::queue (int sig, int value /* = 0 */)
 #else
     sig = 0;   // silence unused warning
     value = 0; // silence unused warning
-    return sig + (long long) value;
+    return 0;
 #endif
 }
 
@@ -365,7 +365,7 @@ Signal::queue (int sig, void *value)
 #else
     sig = 0;   // silence unused warning
     value = 0; // silence unused warning
-    return sig + (long long)value;
+    return 0;
 #endif
 }
 
@@ -452,7 +452,7 @@ Signal::wait (const sigset_t *mask,
     mask = 0;  // silence unused warning
     info = 0;  // silence unused warning
     msecs = 0; // silence unused warning
-    return (long long) mask + (long long)info + msecs;
+    return 0;
 #endif
 }
 

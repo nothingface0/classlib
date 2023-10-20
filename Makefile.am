@@ -145,7 +145,55 @@ libclasslib_la_SOURCES =			\
   src/iotools/StorageOutputStream.cpp		\
   src/iotools/StorageStreamBuf.cpp		\
   src/iotools/SubStorage.cpp			\
-  src/iotools/WriteBuffer.cpp			
+  src/iotools/WriteBuffer.cpp			\
+  src/zip/Adler32.cpp				\
+  src/zip/BZCompressor.cpp			\
+  src/zip/BZDecompressor.cpp			\
+  src/zip/BZError.cpp				\
+  src/zip/BZIPInputStream.cpp			\
+  src/zip/BZIPOutputStream.cpp			\
+  src/zip/CPIOConstants.cpp			\
+  src/zip/CPIOError.cpp				\
+  src/zip/CPIOInputStream.cpp			\
+  src/zip/CPIOMember.cpp			\
+  src/zip/CPIOOutputStream.cpp			\
+  src/zip/CRC32.cpp				\
+  src/zip/CheckedInputStream.cpp		\
+  src/zip/CheckedOutputStream.cpp		\
+  src/zip/Checksum.cpp				\
+  src/zip/CompressOutputStream.cpp		\
+  src/zip/Compressor.cpp			\
+  src/zip/DecompressInputStream.cpp		\
+  src/zip/Decompressor.cpp			\
+  src/zip/Digest.cpp				\
+  src/zip/GZIPInputStream.cpp			\
+  src/zip/GZIPOutputStream.cpp			\
+  src/zip/InteractiveCompressor.cpp		\
+  src/zip/InteractiveDecompressor.cpp		\
+  src/zip/LZMACompressor.cpp			\
+  src/zip/LZMADecompressor.cpp			\
+  src/zip/LZMAError.cpp				\
+  src/zip/LZOCompressor.cpp			\
+  src/zip/LZODecompressor.cpp			\
+  src/zip/LZOError.cpp				\
+  src/zip/MD5Digest.cpp				\
+  src/zip/SHA1Digest.cpp			\
+  src/zip/SHA1Error.cpp				\
+  src/zip/TarConstants.cpp			\
+  src/zip/TarError.cpp				\
+  src/zip/TarInputStream.cpp			\
+  src/zip/TarMember.cpp				\
+  src/zip/TarOutputStream.cpp			\
+  src/zip/ZCompressor.cpp			\
+  src/zip/ZDecompressor.cpp			\
+  src/zip/ZError.cpp				\
+  src/zip/ZInputStream.cpp			\
+  src/zip/ZOutputStream.cpp			\
+  src/zip/ZipArchive.cpp			\
+  src/zip/ZipInputStream.cpp			\
+  src/zip/ZipMember.cpp				\
+  src/zip/ZipOutputStream.cpp			\
+  src/zip/ZipUtils.cpp
 
 nobase_include_HEADERS =			\
   classlib/sysapi/config.h			\
@@ -307,7 +355,59 @@ nobase_include_HEADERS =			\
   classlib/utils/Unwind.h			\
   classlib/utils/UserInfo.h			\
   classlib/utils/XTypeInfo.h			\
-  classlib/utils/iosfwd.h			
+  classlib/utils/iosfwd.h			\
+  classlib/zip/Adler32.h			\
+  classlib/zip/BZCompressor.h			\
+  classlib/zip/BZConstants.h			\
+  classlib/zip/BZDecompressor.h			\
+  classlib/zip/BZError.h			\
+  classlib/zip/BZIPInputStream.h		\
+  classlib/zip/BZIPOutputStream.h		\
+  classlib/zip/CPIOConstants.h			\
+  classlib/zip/CPIOError.h			\
+  classlib/zip/CPIOInputStream.h		\
+  classlib/zip/CPIOMember.h			\
+  classlib/zip/CPIOOutputStream.h		\
+  classlib/zip/CRC32.h				\
+  classlib/zip/CheckedInputStream.h		\
+  classlib/zip/CheckedOutputStream.h		\
+  classlib/zip/Checksum.h			\
+  classlib/zip/CompressOutputStream.h		\
+  classlib/zip/Compressor.h			\
+  classlib/zip/DecompressInputStream.h		\
+  classlib/zip/Decompressor.h			\
+  classlib/zip/Digest.h				\
+  classlib/zip/GZIPInputStream.h		\
+  classlib/zip/GZIPOutputStream.h		\
+  classlib/zip/InteractiveCompressor.h		\
+  classlib/zip/InteractiveDecompressor.h	\
+  classlib/zip/LZMACompressor.h			\
+  classlib/zip/LZMAConstants.h			\
+  classlib/zip/LZMADecompressor.h		\
+  classlib/zip/LZMAError.h			\
+  classlib/zip/LZOCompressor.h			\
+  classlib/zip/LZOConstants.h			\
+  classlib/zip/LZODecompressor.h		\
+  classlib/zip/LZOError.h			\
+  classlib/zip/MD5Digest.h			\
+  classlib/zip/SHA1Digest.h			\
+  classlib/zip/SHA1Error.h			\
+  classlib/zip/TarConstants.h			\
+  classlib/zip/TarError.h			\
+  classlib/zip/TarInputStream.h			\
+  classlib/zip/TarMember.h			\
+  classlib/zip/TarOutputStream.h		\
+  classlib/zip/ZCompressor.h			\
+  classlib/zip/ZConstants.h			\
+  classlib/zip/ZDecompressor.h			\
+  classlib/zip/ZError.h				\
+  classlib/zip/ZInputStream.h			\
+  classlib/zip/ZOutputStream.h			\
+  classlib/zip/ZipArchive.h			\
+  classlib/zip/ZipInputStream.h			\
+  classlib/zip/ZipMember.h			\
+  classlib/zip/ZipOutputStream.h		\
+  classlib/zip/ZipUtils.h
 
 TESTS_ENVIRONMENT = QUIET_ASSERT=a
 TESTS = $(check_PROGRAMS)
@@ -463,7 +563,53 @@ classlib_test_SOURCES =				\
   test/utils/exa_Log.cpp			\
   test/utils/exa_ResourceInfo.cpp		\
   test/utils/exa_Signal.cpp			\
-  test/utils/LogListener.cpp			
+  test/utils/LogListener.cpp			\
+  test/zip/Adler3201.cpp			\
+  test/zip/BZCompressor01.cpp			\
+  test/zip/BZDecompressor01.cpp			\
+  test/zip/BZIPInputStream01.cpp		\
+  test/zip/BZIPOutputStream01.cpp		\
+  test/zip/CPIOInputStream01.cpp		\
+  test/zip/CPIOInputStream02.cpp		\
+  test/zip/CPIOOutputStream00.cpp		\
+  test/zip/CPIOOutputStream01.cpp		\
+  test/zip/CPIOOutputStream02.cpp		\
+  test/zip/CPIOOutputStream03.cpp		\
+  test/zip/CRC3201.cpp				\
+  test/zip/CheckedInputStream01.cpp		\
+  test/zip/CheckedOutputStream01.cpp		\
+  test/zip/GZIPInputStream01.cpp		\
+  test/zip/GZIPInputStream02.cpp		\
+  test/zip/GZIPOutputStream01.cpp		\
+  test/zip/InteractiveCompressor01.cpp		\
+  test/zip/InteractiveDecompressor01.cpp	\
+  test/zip/LZMACompressor01.cpp			\
+  test/zip/LZOCompressor01.cpp			\
+  test/zip/MD5Digest01.cpp			\
+  test/zip/SHA1Digest01.cpp			\
+  test/zip/TarInputStream01.cpp			\
+  test/zip/TarInputStream02.cpp			\
+  test/zip/TarInputStream03.cpp			\
+  test/zip/TarOutputStream00.cpp		\
+  test/zip/TarOutputStream01.cpp		\
+  test/zip/ZCompressor01.cpp			\
+  test/zip/ZDecompressor01.cpp			\
+  test/zip/ZInputStream01.cpp			\
+  test/zip/ZOutputStream01.cpp			\
+  test/zip/ZipArchive01.cpp			\
+  test/zip/ZipArchive02.cpp			\
+  test/zip/ZipArchive03.cpp			\
+  test/zip/ZipArchive04.cpp			\
+  test/zip/ZipArchive05.cpp			\
+  test/zip/ZipArchive06.cpp			\
+  test/zip/ZipArchive07.cpp			\
+  test/zip/ZipArchive08.cpp			\
+  test/zip/ZipInputStream01.cpp			\
+  test/zip/ZipInputStream02.cpp			\
+  test/zip/ZipInputStream03.cpp			\
+  test/zip/ZipOutputStream00.cpp		\
+  test/zip/ZipOutputStream01.cpp		\
+  test/zip/ZipUtils01.cpp
 
 TestDriver.cpp: Makefile
 	@(echo '#include <ctype.h>';				\

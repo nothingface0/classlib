@@ -452,7 +452,7 @@ TarInputStream::readExtendedAttrs (TarMember &xdata, uint8_t &xfields, IOOffset 
 	   throw TarError (TarError::HEADER_VALUE_ERROR);
 
 	// Find property name end at the first equal sign.
-	char *propname = ++end;
+	const char *propname = ++end;
 	if (! (end = strchr(propname, '=')) || end - p > reclen)
 	    throw TarError (TarError::HEADER_VALUE_ERROR);
 	ptrdiff_t proplen = end++ - propname;
